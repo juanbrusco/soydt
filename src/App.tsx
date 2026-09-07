@@ -1244,6 +1244,8 @@ export default function App() {
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10 py-4 px-4 text-center text-[11px] uppercase tracking-[0.25em] text-white/40 font-mono-code relative z-10 flex items-center justify-center gap-3">
+        <span className="text-white/25">v{__APP_VERSION__}</span>
+        <span className="text-white/15">•</span>
         <span>CREADO POR JOTA</span>
         <span className="text-white/20">•</span>
         <a

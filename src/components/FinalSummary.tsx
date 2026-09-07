@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Formation, ModeRecord, Player, RankingTier } from '../types/game';
 import { Trophy, Share2, Check, RotateCcw, Flame, X, ExternalLink, Sparkles, Crown, Home } from 'lucide-react';
 import { sound } from '../utils/audio';
-import { ShareCardModal } from './ShareCardModal';
 
 interface FinalSummaryProps {
   score: number;
@@ -49,7 +48,6 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showCardModal, setShowCardModal] = useState(false);
   const dtName = initialPlayerName;
   const totalSlots = formation.slots.length;
 
@@ -98,7 +96,7 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
 
     const eventsNote = eventsDisabled ? '\n⚠️ (Partida jugada sin QUILOMBOS)' : '';
     const dtLabel = dtName.trim() ? `\n🧢 DT: ${dtName.trim().toUpperCase()}` : '';
-    return `🏆 ¡Armé mi equipo en SoyDT!${dtLabel}\n⚽ FORMACIÓN: ${formationCode}\n⭐ SCORE TOTAL: ${score} PTS\n🎖️ RANGO: ${rankingTier.title} ${rankingTier.badge}${eventsNote}\n\n📋 MI EQUIPO:\n${playerLines}\n\n👉 Jugá y armá tu formación acá: ${appUrl}`;
+    return `🏆 ¡Armé mi equipo en SoyDT!${dtLabel}\n⚽ FORMACIÓN: ${formationCode}\n⭐ TOTAL: ${score} PTS\n🎖️ RANGO: ${rankingTier.title} ${rankingTier.badge}${eventsNote}\n\n📋 MI EQUIPO:\n${playerLines}\n\n👉 Jugá y armá tu formación acá: ${appUrl}`;
   };
 
   const handleShareClick = async () => {
@@ -369,7 +367,7 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
       </div>
 
       {/* Action Buttons: COMPARTIR, JUGAR DE NUEVO & VOLVER AL INICIO */}
-      <div className="w-full flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="w-full flex flex-col  gap-2 mb-6">
         {onGoHome && (
           <button
             id="final-summary-home-btn"
@@ -394,15 +392,6 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
           <span>COMPARTIR</span>
         </button>
 
-        {/* TARJETA Button */}
-        <button
-          onClick={() => { sound.playClick(); setShowCardModal(true); }}
-          className="flex-1 py-4 px-6 rounded-xl bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/40 text-white font-black font-display text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg"
-        >
-          <Sparkles className="w-5 h-5" />
-          <span>COMPARTIR TARJETA</span>
-        </button>
-
         {/* JUGAR DE NUEVO Button */}
         <button
           onClick={handleRestart}
@@ -413,33 +402,21 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
         </button>
       </div>
 
-      {/* TARJETA TÁCTICA MODAL */}
-      <ShareCardModal
-        isOpen={showCardModal}
-        onClose={() => setShowCardModal(false)}
-        playerName={dtName}
-        score={score}
-        formation={formation}
-        rankingTier={rankingTier}
-        runCode={runCode}
-        selectedPlayers={selectedPlayers}
-        friendRoomResult={friendRoomResult}
-      />
 
       {/* CARD RESUMEN MODAL (For Visual Result Sharing & Copying) */}
       {showShareModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-lg bg-[#0d0d0d] border border-white/20 rounded-2xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             {/* Close Button */}
-            <button
+            {/* <button
               onClick={() => setShowShareModal(false)}
               className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
             >
               <X className="w-5 h-5" />
-            </button>
+            </button> */}
 
             {/* Share Header */}
-            <div className="text-center mb-5">
+            {/* <div className="text-center mb-5">
               <div className="text-3xl mb-1">{rankingTier.badge}</div>
               <p className="text-[11px] uppercase font-bold tracking-[0.25em] text-[#38BDF8]">
                 RESUMEN
@@ -447,13 +424,13 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
               <h3 className="text-2xl font-black text-white font-display uppercase tracking-tight">
                 SoyDT // {formationCode}
               </h3>
-            </div>
+            </div> */}
 
             {/* Compact Graphic Card Preview */}
             <div className="bg-[#050505] border border-white/15 rounded-xl p-5 mb-5 relative overflow-hidden">
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
                 <div>
-                  <span className="text-[11px] uppercase font-bold text-white/50 tracking-wider">SCORE FINAL</span>
+                  {/* <span className="text-[11px] uppercase font-bold text-white/50 tracking-wider">SCORE FINAL</span> */}
                   <div className="text-3xl font-black text-white font-display leading-tight">{score} PTS</div>
                 </div>
                 <div className="text-right">
@@ -462,7 +439,7 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
                 </div>
               </div>
 
-              <div className="text-xs font-black uppercase text-amber-400 font-display mb-3">
+              <div className="text-md font-black uppercase text-amber-400 font-display mb-3">
                 {rankingTier.title}
               </div>
 
@@ -488,7 +465,9 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
 
               {/* App Link Footer */}
               <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[12px] text-white/50">
-                <span className="font-mono-code text-[#38BDF8]">SoyDT - Roguelike Táctico</span>
+                <span className="font-mono-code text-[#38BDF8]">SoyDT</span>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[12px] text-white/50">
                 <span className="truncate max-w-[180px]">{appUrl}</span>
               </div>
             </div>

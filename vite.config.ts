@@ -1,10 +1,14 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pkg = require('./package.json');
 
 export default defineConfig(() => {
   return {
+    define: { __APP_VERSION__: JSON.stringify(pkg.version) },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
