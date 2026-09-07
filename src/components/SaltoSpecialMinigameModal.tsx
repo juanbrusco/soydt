@@ -113,12 +113,12 @@ export const SaltoSpecialMinigameModal: React.FC<SaltoSpecialMinigameModalProps>
                   <span>PREGUNTA DE FÚTBOL</span>
                 </div>
 
-                <div className="text-xs sm:text-sm font-display font-bold text-white leading-snug">
+                <div className="text-sm font-display font-bold text-white leading-snug">
                   {trivia.question}
                 </div>
 
                 {/* 2 Choices */}
-                <div className="grid grid-cols-2 gap-2 pt-0.5">
+                <div className="gap-2 pt-0.5">
                   {options.map((option, idx) => (
                     <button
                       key={idx}

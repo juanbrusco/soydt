@@ -65,12 +65,21 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Mobile Quick Controls: Flame (Quilombo events) and Sound Toggle */}
           <div className="flex items-center gap-2 md:hidden">
+            <button
+              id="header-home-toggle-desktop"
+              onClick={handleHomeClick}
+              className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-white/70 hover:text-white"
+              title={'Volver al inicio'}
+            >
+              <Home className="w-4 h-4 text-[#38BDF8]" />
+            </button>
+            
             {/* Quilombo Events Toggle Button (Fueguito) */}
             <button
               onClick={onToggleEvents}
               className={`p-2 rounded-xl border transition-all ${eventsEnabled
-                  ? 'bg-orange-500/10 border-orange-500/40 text-orange-400'
-                  : 'bg-white/[0.04] border-white/10 text-white/30'
+                ? 'bg-orange-500/10 border-orange-500/40 text-orange-400'
+                : 'bg-white/[0.04] border-white/10 text-white/30'
                 }`}
               title={
                 eventsEnabled
@@ -167,8 +176,8 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onToggleEvents}
             className={`p-2 rounded-xl border transition-all ${eventsEnabled
-                ? 'bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/40 text-orange-400'
-                : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-white/30'
+              ? 'bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/40 text-orange-400'
+              : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-white/30'
               }`}
             title={
               eventsEnabled
