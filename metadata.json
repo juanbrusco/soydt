@@ -1,0 +1,6 @@
+{
+  "name": "SoyDT!",
+  "description": "Roguelike narrativo y de selección de fútbol donde armas tu plantel con decisiones rápidas, eventos caóticos y RNG determinista para lograr el máximo OVR.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
