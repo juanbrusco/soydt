@@ -68,11 +68,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Quilombo Events Toggle Button (Fueguito) */}
             <button
               onClick={onToggleEvents}
-              className={`p-2 rounded-xl border transition-all ${
-                eventsEnabled
+              className={`p-2 rounded-xl border transition-all ${eventsEnabled
                   ? 'bg-orange-500/10 border-orange-500/40 text-orange-400'
                   : 'bg-white/[0.04] border-white/10 text-white/30'
-              }`}
+                }`}
               title={
                 eventsEnabled
                   ? 'Eventos QUILOMBO: ACTIVADOS (Click para desactivar)'
@@ -115,9 +114,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center: Mode Indicator & Return to Home Button */}
-        {!isHome ? (
+        {/* {!isHome ? (
           <div className="flex items-center justify-between sm:justify-center gap-2 w-full md:w-auto">
-            {/* Current Game Mode Badge (informational, not switchable in-match) */}
             <div className="px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-mono-code font-bold uppercase text-white/90 flex items-center gap-2">
               {currentMode === 'FUTBOL11_SALTO' ? (
                 <>
@@ -137,7 +135,6 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* Return to Initial Menu Button */}
             {onGoHome && (
               <button
                 onClick={handleHomeClick}
@@ -151,18 +148,28 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         ) : (
             <span></span>
-        )}
+        )} */}
 
         {/* Desktop Technical Info & Actions */}
         <div className="hidden md:flex items-center gap-3">
+
+          {/* Go Gome */}
+          <button
+            id="header-home-toggle-desktop"
+            onClick={handleHomeClick}
+            className="p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white/70 hover:text-white transition-colors"
+            title={'Volver al inicio'}
+          >
+            <Home className="w-4 h-4 text-[#38BDF8]" />
+          </button>
+
           {/* Quilombo Events Toggle Button (Fueguito) */}
           <button
             onClick={onToggleEvents}
-            className={`p-2 rounded-xl border transition-all ${
-              eventsEnabled
+            className={`p-2 rounded-xl border transition-all ${eventsEnabled
                 ? 'bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/40 text-orange-400'
                 : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-white/30'
-            }`}
+              }`}
             title={
               eventsEnabled
                 ? 'Eventos QUILOMBO: ACTIVADOS (Click para desactivar)'
