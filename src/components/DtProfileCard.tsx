@@ -79,7 +79,7 @@ export const DtProfileCard: React.FC<DtProfileCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-[13px] font-mono-code font-bold uppercase tracking-[0.2em] text-[#38BDF8]">
-                DIRECTOR TÉCNICO
+                INGRESÁ TU NOMBRE
               </span>
               {savedSuccess && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-mono-code font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 animate-fadeIn">
@@ -117,21 +117,21 @@ export const DtProfileCard: React.FC<DtProfileCardProps> = ({
               </form>
             ) : (
               <div className="flex items-center gap-2.5">
-                <h3 className="text-base sm:text-lg font-black uppercase font-display tracking-tight text-white truncate">
-                  {playerName || 'DT'}
+                <h3 className="text-base sm:text-lg font-black bg-white/20 uppercase font-display tracking-tight text-white truncate">
+                  {playerName || 'PEP GUARDIOLA'}
                 </h3>
                 <button
                   id="dt-edit-name-btn"
                   onClick={handleStartEdit}
-                  className="p-1 rounded-md text-white/40 hover:text-[#38BDF8] hover:bg-white/5 transition-colors cursor-pointer"
+                  className="p-2 rounded-md text-[#38BDF8] hover:text-[#38BDF8] hover:bg-white/5 transition-colors cursor-pointer"
                   title="Cambiar apodo de DT"
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
+                  <Edit3 className="w-4.5 h-4.5" />
                 </button>
               </div>
             )}
             <p className="text-[14px] truncate">
-              {isEditing ? 'Ingresá el nombre que figurará en el ranking' : 'Nombre que figura en tus récords y partidas'}
+              {isEditing ? 'Nombre que figurará en el ranking' : 'Nombre para récords y partidas'}
             </p>
           </div>
         </div>
