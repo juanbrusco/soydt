@@ -40,4 +40,4 @@ El juego incluye:
 1. GoogleAI Studio (desarrollo inicial)
 2. NeonDB plan free
 3. Vercel plan free
-4. GitLab
+4. GitHub
