@@ -115,6 +115,7 @@ export default function App() {
   const [loadingStatusText, setLoadingStatusText] = useState<string | undefined>(undefined);
   const [dynamicGlobalPlayers, setDynamicGlobalPlayers] = useState<Player[]>(PLAYERS_DB);
   const [dynamicSaltoPlayers, setDynamicSaltoPlayers] = useState<Player[]>(PLAYERS_SALTO_DB);
+  const [playersSource, setPlayersSource] = useState<'db' | 'cache' | 'fallback' | null>(null);
 
   const handleSavePlayerName = async (newName: string): Promise<boolean> => {
     savePlayerName(newName);
@@ -246,6 +247,7 @@ export default function App() {
 
             if (salto.length > 0) setDynamicSaltoPlayers(salto);
             if (global.length > 0) setDynamicGlobalPlayers(global);
+            setPlayersSource(data.source ?? 'db');
 
             console.log(
               `[SoyDT] Base de jugadores cargada desde ${data.source}: ${global.length} globales, ${salto.length} de Salto.`
@@ -456,12 +458,7 @@ export default function App() {
       setCurrentMode(room.mode);
       setIsHome(false);
 
-      const decoded = decodeRunCode(room.runCode);
-      if (decoded) {
-        startNewRun(room.mode, decoded);
-      } else {
-        startNewRun(room.mode);
-      }
+      startNewRun(room.mode);
     },
     [currentPlayerName, startNewRun]
   );
@@ -1115,6 +1112,7 @@ export default function App() {
             playerName={currentPlayerName}
             onSavePlayerName={handleSavePlayerName}
             recentRuns={recentRuns}
+            playersSource={playersSource}
           />
         ) : runState && !runState.isComplete ? (
           <div className="flex flex-col gap-2.5 sm:gap-6 w-full">
@@ -1240,6 +1238,8 @@ export default function App() {
         initialCode={friendRoomInitialCode}
         currentDtName={currentPlayerName}
         onStartRoomMatch={handleStartRoomMatch}
+        onSavePlayerName={handleSavePlayerName}
+        recentRuns={recentRuns}
       />
 
       {/* Footer */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RunHistoryItem } from '../types/game';
 import { UserCheck, Edit3, Check, Clock, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { sound } from '../utils/audio';
@@ -7,14 +7,20 @@ interface DtProfileCardProps {
   playerName: string;
   onSavePlayerName: (newName: string) => Promise<boolean> | void;
   recentRuns: RunHistoryItem[];
+  autoEdit?: boolean;
 }
 
 export const DtProfileCard: React.FC<DtProfileCardProps> = ({
   playerName,
   onSavePlayerName,
   recentRuns,
+  autoEdit = false,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (autoEdit) setIsEditing(true);
+  }, [autoEdit]);
   const [inputName, setInputName] = useState(playerName);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);

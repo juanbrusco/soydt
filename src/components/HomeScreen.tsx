@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameMode, AllRecords, RunHistoryItem } from '../types/game';
 import { getGlobalGameRecords, GlobalRecordsMap } from '../utils/globalRecords';
 import { DtProfileCard } from './DtProfileCard';
@@ -29,6 +29,7 @@ interface HomeScreenProps {
   playerName: string;
   onSavePlayerName: (newName: string) => Promise<boolean> | void;
   recentRuns: RunHistoryItem[];
+  playersSource?: 'db' | 'cache' | 'fallback' | null;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -42,20 +43,40 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   playerName,
   onSavePlayerName,
   recentRuns,
+  playersSource,
 }) => {
+  const [pendingAction, setPendingAction] = useState<GameMode | 'FRIEND_ROOMS' | null>(null);
+
+  const canContinue = playerName.trim() !== '' && playerName.trim().toUpperCase() !== 'DT';
+
   const handleSelect = (mode: GameMode) => {
     sound.playClick();
-    onSelectMode(mode);
+    setPendingAction(mode);
+  };
+
+  const handleFriendRooms = () => {
+    sound.playClick();
+    setPendingAction('FRIEND_ROOMS');
+  };
+
+  const handleConfirm = () => {
+    if (!pendingAction) return;
+    if (pendingAction === 'FRIEND_ROOMS') {
+      onOpenFriendRooms();
+    } else {
+      onSelectMode(pendingAction);
+    }
+    setPendingAction(null);
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto py-2 sm:py-6 flex flex-col gap-6 sm:gap-8 animate-fadeIn">
       {/* DT Profile & Recent Runs Accordion */}
-      <DtProfileCard
+      {/* <DtProfileCard
         playerName={playerName}
         onSavePlayerName={onSavePlayerName}
         recentRuns={recentRuns}
-      />
+      /> */}
       {/* Hero Welcome Section */}
       {/*<div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[#38BDF8] text-[12px] font-mono-code font-bold uppercase tracking-[0.25em]">
@@ -71,6 +92,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           Elegí tu formato táctico para iniciar el draft de jugadores. Tomá decisiones, gestioná cambios y llevá tu plantel a la máxima puntuación.
         </p>
       </div>*/}
+
+      {/* DB source indicator */}
+      {playersSource === 'fallback' && (
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full flex-shrink-0 bg-red-400" />
+          <span className="text-[10px] font-mono-code font-bold uppercase tracking-[0.2em] text-white/30">
+            Datos locales (sin conexión)
+          </span>
+        </div>
+      )}
 
       {/* 4 Mode Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
@@ -230,11 +261,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Torneo de Amigos: Salas privadas con link y tabla de posiciones */}
-      <div 
-        onClick={() => {
-          sound.playClick();
-          onOpenFriendRooms();
-        }}
+      <div
+        onClick={handleFriendRooms}
         className="group relative w-full rounded-2xl bg-gradient-to-r from-emerald-950/30 via-[#0a0a0a] to-[#38BDF8]/10 border border-white/15 hover:border-[#38BDF8]/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 shadow-xl cursor-pointer hover:shadow-[0_0_25px_rgba(56,189,248,0.12)] active:scale-[0.99]"
       >
         <div className="flex items-center gap-3.5 w-full sm:w-auto">
@@ -294,6 +322,58 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </span>
         </button>
       </div>
+
+      {/* Modal: nombre de DT requerido para jugar */}
+      {pendingAction !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-lg rounded-2xl bg-[#0a0a0a] border border-white/15 shadow-2xl flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="px-5 pt-5 pb-4 border-b border-white/10">
+              <p className="text-[11px] font-mono-code font-bold uppercase tracking-[0.25em] text-[#38BDF8] mb-1">
+                ANTES DE JUGAR
+              </p>
+              <h3 className="text-lg font-black uppercase font-display tracking-tight text-white">
+                Ingresá tu nombre de DT
+              </h3>
+              <p className="text-[12px] text-white/50 mt-0.5">
+                Figurará en el ranking y en tus récords personales.
+              </p>
+            </div>
+
+            {/* DtProfileCard */}
+            <div className="p-5">
+              <DtProfileCard
+                playerName={playerName}
+                onSavePlayerName={onSavePlayerName}
+                recentRuns={recentRuns}
+                autoEdit={!canContinue}
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="px-5 pb-5 flex items-center gap-3">
+              <button
+                onClick={() => setPendingAction(null)}
+                className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white/50 hover:text-white font-mono-code font-bold text-xs uppercase tracking-wider transition-all"
+              >
+                VOLVER
+              </button>
+              <button
+                onClick={handleConfirm}
+                disabled={!canContinue}
+                className={`flex-1 py-2.5 rounded-xl font-black font-display text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                  canContinue
+                    ? 'bg-[#38BDF8] hover:bg-[#38BDF8]/90 text-black shadow-lg shadow-[#38BDF8]/20 cursor-pointer'
+                    : 'bg-white/[0.05] text-white/25 cursor-not-allowed border border-white/10'
+                }`}
+              >
+                <ArrowRight className="w-4 h-4" />
+                CONTINUAR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

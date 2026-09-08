@@ -29,6 +29,8 @@ import {
   SavedRoomRef
 } from '../utils/friendRooms';
 import { sound } from '../utils/audio';
+import { DtProfileCard } from './DtProfileCard';
+import { RunHistoryItem } from '../types/game';
 
 interface FriendRoomModalProps {
   isOpen: boolean;
@@ -36,6 +38,8 @@ interface FriendRoomModalProps {
   initialCode?: string | null;
   currentDtName: string;
   onStartRoomMatch: (room: FriendRoom, playerName: string) => void;
+  onSavePlayerName: (newName: string) => Promise<boolean> | void;
+  recentRuns: RunHistoryItem[];
 }
 
 export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
@@ -44,6 +48,8 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
   initialCode,
   currentDtName,
   onStartRoomMatch,
+  onSavePlayerName,
+  recentRuns,
 }) => {
   const [tab, setTab] = useState<'VIEW' | 'CREATE' | 'JOIN'>(initialCode ? 'VIEW' : 'CREATE');
   const [activeRoom, setActiveRoom] = useState<FriendRoom | null>(null);
@@ -59,6 +65,9 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
   const [createMode, setCreateMode] = useState<'FUTBOL11' | 'FUTBOL11_SALTO'>('FUTBOL11_SALTO');
   const [joinCodeInput, setJoinCodeInput] = useState<string>('');
   const [recentRooms, setRecentRooms] = useState<SavedRoomRef[]>([]);
+  const [showNameModal, setShowNameModal] = useState(false);
+
+  const hasValidName = currentDtName.trim() !== '' && currentDtName.trim().toUpperCase() !== 'DT';
 
   useEffect(() => {
     if (isOpen) {
@@ -170,8 +179,8 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
   const handlePlayMatch = () => {
     if (!activeRoom) return;
     const cleanNick = currentDtName.trim().toUpperCase();
-    if (!cleanNick) {
-      setErrorMessage('Configurá tu nombre de DT en la pantalla principal para participar.');
+    if (!hasValidName) {
+      setShowNameModal(true);
       return;
     }
 
@@ -221,7 +230,7 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
                 </span>
               </h3>
               <p className="text-[12px] text-white/50">
-                Mismas cartas y rivales. Máximo 10 amigos, 1 intento por apodo.
+                Máximo 10 amigos, 1 intento por DT.
               </p>
             </div>
           </div>
@@ -393,7 +402,7 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
                       <Check className="w-4 h-4 stroke-[3]" />
                       <span>¡YA JUGASTE TU PARTIDO EN ESTE TORNEO!</span>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 py-2 px-3 bg-black/60 rounded-xl border border-white/5 max-w-sm mx-auto">
+                    {/* <div className="grid grid-cols-3 gap-2 py-2 px-3 bg-black/60 rounded-xl border border-white/5 max-w-sm mx-auto">
                       <div>
                         <span className="text-[11px]  text-white/40 uppercase block">DT</span>
                         <span className="text-xs font-display font-black text-white truncate block">
@@ -412,10 +421,10 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
                           {currentUserEntry.score}
                         </span>
                       </div>
-                    </div>
-                    <p className="text-[11px] text-white/50 ">
+                    </div> */}
+                    {/* <p className="text-[11px] text-white/50 ">
                       Solo se permite 1 intento por DT para garantizar juego limpio. Seguí las posiciones de tus rivales abajo.
-                    </p>
+                    </p> */}
                   </div>
                 ) : activeRoom.isFull ? (
                   <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center space-y-1">
@@ -629,11 +638,11 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 text-[13px] text-white/50 space-y-1">
+              {/* <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 text-[13px] text-white/50 space-y-1">
                 <p>• La sala generará una semilla compartida con las mismas cartas para todos.</p>
                 <p>• Podrás compartir el link directamente por WhatsApp con un solo toque.</p>
                 <p>• Límite: Mínimo 2, Máximo 10 participantes, 1 intento por apodo.</p>
-              </div>
+              </div> */}
 
               <button
                 type="submit"
@@ -685,7 +694,7 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
               </button>
 
               {/* Recent Rooms */}
-              {recentRooms.length > 0 && (
+              {/* {recentRooms.length > 0 && (
                 <div className="pt-3 border-t border-white/10 space-y-2">
                   <span className="text-[11px]  font-bold uppercase text-white/40 block">
                     SALAS VISITADAS RECIENTEMENTE:
@@ -731,11 +740,63 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
             </form>
           )}
         </div>
       </div>
+
+      {/* Modal: nombre de DT requerido para jugar en sala */}
+      {showNameModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-lg rounded-2xl bg-[#0a0a0a] border border-white/15 shadow-2xl flex flex-col overflow-hidden">
+            <div className="px-5 pt-5 pb-4 border-b border-white/10">
+              <p className="text-[11px] font-mono-code font-bold uppercase tracking-[0.25em] text-[#38BDF8] mb-1">
+                ANTES DE JUGAR
+              </p>
+              <h3 className="text-lg font-black uppercase font-display tracking-tight text-white">
+                Ingresá tu nombre de DT
+              </h3>
+              <p className="text-[12px] text-white/50 mt-0.5">
+                Figurará en el ranking de esta sala y en tus récords.
+              </p>
+            </div>
+            <div className="p-5">
+              <DtProfileCard
+                playerName={currentDtName}
+                onSavePlayerName={onSavePlayerName}
+                recentRuns={recentRuns}
+                autoEdit={true}
+              />
+            </div>
+            <div className="px-5 pb-5 flex items-center gap-3">
+              <button
+                onClick={() => setShowNameModal(false)}
+                className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white/50 hover:text-white font-mono-code font-bold text-xs uppercase tracking-wider transition-all"
+              >
+                VOLVER
+              </button>
+              <button
+                onClick={() => {
+                  if (hasValidName) {
+                    setShowNameModal(false);
+                    handlePlayMatch();
+                  }
+                }}
+                disabled={!hasValidName}
+                className={`flex-1 py-2.5 rounded-xl font-black font-display text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                  hasValidName
+                    ? 'bg-[#38BDF8] hover:bg-[#38BDF8]/90 text-black shadow-lg shadow-[#38BDF8]/20 cursor-pointer'
+                    : 'bg-white/[0.05] text-white/25 cursor-not-allowed border border-white/10'
+                }`}
+              >
+                <ArrowRight className="w-4 h-4" />
+                CONTINUAR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
