@@ -83,7 +83,7 @@ export const FinalSummary: React.FC<FinalSummaryProps> = ({
       ? '4-3-3'
       : '1-2-1';
 
-  const appUrl = typeof window !== 'undefined' ? window.location.origin || window.location.href : 'https://soydt.app';
+  const appUrl = typeof window !== 'undefined' ? window.location.origin || window.location.href : 'https://soydt-salto.vercel.app/';
 
   const generateShareText = () => {
     const playerLines = formation.slots

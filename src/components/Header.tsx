@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleShareClick = () => {
     sound.playClick();
     const url = window.location.origin;
-    const text = `¡Arma tu equipo ideal! 🏆⚽ Jugá SoyDT: ${url}`;
+    const text = `¡Arma tu equipo ideal y convertite en el primero en el ranking! 🏆⚽ Jugá SoyDT: ${url}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 

@@ -103,7 +103,7 @@ export const DtProfileCard: React.FC<DtProfileCardProps> = ({
                   value={inputName}
                   onChange={(e) => setInputName(e.target.value.toUpperCase())}
                   placeholder="APODO DE DT"
-                  className="bg-black/80 border border-[#38BDF8] rounded-lg px-2.5 py-1 text-xs font-mono-code font-bold uppercase text-white tracking-wider focus:outline-none w-44 sm:w-56"
+                  className="bg-black/80 border border-[#38BDF8] rounded-lg px-2.5 py-1 text-xs font-mono-code font-bold uppercase text-white tracking-wider focus:outline-none w-35 sm:w-45"
                   style={{ fontSize: '16px' }}
                 />
                 <button
