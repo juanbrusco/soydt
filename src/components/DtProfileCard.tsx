@@ -98,11 +98,13 @@ export const DtProfileCard: React.FC<DtProfileCardProps> = ({
               <form onSubmit={handleFormSubmit} className="flex items-center gap-2 mt-1">
                 <input
                   type="text"
+                  autoFocus
                   maxLength={25}
                   value={inputName}
                   onChange={(e) => setInputName(e.target.value.toUpperCase())}
                   placeholder="APODO DE DT"
                   className="bg-black/80 border border-[#38BDF8] rounded-lg px-2.5 py-1 text-xs font-mono-code font-bold uppercase text-white tracking-wider focus:outline-none w-44 sm:w-56"
+                  style={{ fontSize: '16px' }}
                 />
                 <button
                   type="submit"
