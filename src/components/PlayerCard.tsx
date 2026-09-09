@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Player, Position } from '../types/game';
-import { RefreshCw, Check, Flame, Shield } from 'lucide-react';
+import { RefreshCw, Check, Flame, Shield, HeartHandshake, ShieldCheck } from 'lucide-react';
 import { sound } from '../utils/audio';
 
 interface PlayerCardProps {
@@ -13,6 +13,7 @@ interface PlayerCardProps {
   onCambiar: () => void;
   onSeleccionar: () => void;
   disabled?: boolean;
+  currentMode: string;
 }
 
 export const PlayerCard: React.FC<PlayerCardProps> = ({
@@ -25,6 +26,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   onCambiar,
   onSeleccionar,
   disabled = false,
+  currentMode
 }) => {
   const [scrambledName, setScrambledName] = useState<string>('');
 
@@ -150,11 +152,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               return (
                 <div
                   key={i}
-                  className={`w-6 h-6 rounded-md flex items-center justify-center text-xs transition-all ${
-                    isAvailable
-                      ? 'bg-[#38BDF8]/20 border border-[#38BDF8] text-[#38BDF8]'
-                      : 'bg-white/[0.02] border border-white/10 text-white/20'
-                  }`}
+                  className={`w-6 h-6 rounded-md flex items-center justify-center text-xs transition-all ${isAvailable
+                    ? 'bg-[#38BDF8]/20 border border-[#38BDF8] text-[#38BDF8]'
+                    : 'bg-white/[0.02] border border-white/10 text-white/20'
+                    }`}
                   title={isAvailable ? 'Cambio disponible' : 'Cambio agotado'}
                 >
                   <RefreshCw className={`w-3 h-3 ${isAvailable ? 'stroke-[2.5]' : 'stroke-1'}`} />
@@ -170,11 +171,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         <button
           onClick={onCambiar}
           disabled={disabled || changesRemaining <= 0 || isRolling}
-          className={`py-3 sm:py-4 px-3 sm:px-4 rounded-xl font-bold font-display uppercase tracking-wider flex items-center justify-center gap-2 text-xs sm:text-base transition-all active:scale-95 shadow-lg ${
-            changesRemaining > 0 && !disabled && !isRolling
-              ? 'bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/20 hover:border-white/40 shadow-black'
-              : 'bg-white/[0.02] text-white/30 border border-white/5 cursor-not-allowed'
-          }`}
+          className={`py-3 sm:py-4 px-3 sm:px-4 rounded-xl font-bold font-display uppercase tracking-wider flex items-center justify-center gap-2 text-xs sm:text-base transition-all active:scale-95 shadow-lg ${changesRemaining > 0 && !disabled && !isRolling
+            ? 'bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/20 hover:border-white/40 shadow-black'
+            : 'bg-white/[0.02] text-white/30 border border-white/5 cursor-not-allowed'
+            }`}
         >
           <RefreshCw className={`w-4 h-4 ${isRolling ? 'animate-spin text-[#38BDF8]' : 'text-white/70'}`} />
           <span>CAMBIAR ({changesRemaining})</span>
@@ -183,16 +183,39 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         <button
           onClick={onSeleccionar}
           disabled={disabled || isRolling}
-          className={`py-3 sm:py-4 px-3 sm:px-4 rounded-xl font-black font-display uppercase tracking-wider flex items-center justify-center gap-2 text-xs sm:text-base transition-all active:scale-95 shadow-lg ${
-            !disabled && !isRolling
-              ? 'bg-[#38BDF8] hover:bg-[#7dd3fc] text-black shadow-[#38BDF8]/20 hover:shadow-[#38BDF8]/40'
-              : 'bg-white/[0.05] text-white/30 border border-white/5 cursor-not-allowed'
-          }`}
+          className={`py-3 sm:py-4 px-3 sm:px-4 rounded-xl font-black font-display uppercase tracking-wider flex items-center justify-center gap-2 text-xs sm:text-base transition-all active:scale-95 shadow-lg ${!disabled && !isRolling
+            ? 'bg-[#38BDF8] hover:bg-[#7dd3fc] text-black shadow-[#38BDF8]/20 hover:shadow-[#38BDF8]/40'
+            : 'bg-white/[0.05] text-white/30 border border-white/5 cursor-not-allowed'
+            }`}
         >
           <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[3]" />
           <span>SELECCIONAR</span>
         </button>
       </div>
+
+      <br></br>
+      {currentMode == 'FUTBOL11_SALTO' && (
+        <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
+            <HeartHandshake className="w-4 h-4" />
+          </div>
+          <div className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans font-medium">
+            <span className="text-amber-300 font-bold">Liga de Salto:</span> Los valores asignados a los jugadores y personajes de la liga local son <span className="text-white font-bold">totalmente ficticios y recreativos</span>. Fueron creados con fines de entretenimiento, humor y cariño comunitario, sin intención de realizar juicios deportivos reales ni ofender a ninguna persona o institución.
+          </div>
+        </div>
+      )}
+
+      {currentMode == 'FUTBOL11' && (
+        <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/10">
+          <div className="p-2 rounded-lg bg-sky-500/15 text-[#38BDF8] shrink-0 mt-0.5">
+            <ShieldCheck className="w-4 h-4" />
+          </div>
+          <div className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans font-medium">
+            <span className="text-white font-bold">Fútbol Internacional:</span> Los puntajes de los jugadores profesionales se basan en las estadísticas oficiales del videojuego EA SPORTS FC 26.
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

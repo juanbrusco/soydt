@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { GameMode, ModeRecord } from '../types/game';
-import { Volume2, VolumeX, Users, Shield, Flame, Home, MapPin, Info } from 'lucide-react';
+import { Volume2, VolumeX, Users, Shield, Flame, Home, MapPin, Info, Share2 } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { InfoDisclaimerModal } from './InfoDisclaimerModal';
 
@@ -45,6 +45,13 @@ export const Header: React.FC<HeaderProps> = ({
     if (onGoHome) onGoHome();
   };
 
+  const handleShareClick = () => {
+    sound.playClick();
+    const url = window.location.origin;
+    const text = `¡Arma tu equipo ideal! 🏆⚽ Jugá SoyDT: ${url}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   return (
     <header className="w-full bg-[#050505]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-40 px-4 py-3.5">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -65,6 +72,16 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Mobile Quick Controls: Flame (Quilombo events) and Sound Toggle */}
           <div className="flex items-center gap-2 md:hidden">
+
+            <button
+              id="header-share-toggle-desktop"
+              onClick={handleShareClick}
+              className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-white/70 hover:text-white"
+              title={'Volver al inicio'}
+            >
+              <Share2 className="w-4 h-4 text-[#38BDF8]" />
+            </button>
+
             <button
               id="header-home-toggle-desktop"
               onClick={handleHomeClick}
@@ -73,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Home className="w-4 h-4 text-[#38BDF8]" />
             </button>
-            
+
             {/* Quilombo Events Toggle Button (Fueguito) */}
             <button
               onClick={onToggleEvents}

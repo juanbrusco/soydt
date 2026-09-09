@@ -1155,6 +1155,7 @@ export default function App() {
               onCambiar={handleCambiar}
               onSeleccionar={handleSeleccionar}
               disabled={!!runState.positionState?.activeEvent || !!saltoActiveEvent || !!futbol11FinalEvent}
+              currentMode={currentMode}
             />
 
             {/* Active Event Fullscreen Modal Overlay (Standard Modes) */}

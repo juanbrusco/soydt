@@ -61,7 +61,7 @@ export const InfoDisclaimerModal: React.FC<InfoDisclaimerModalProps> = ({
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans font-medium">
-              <span className="text-white font-bold">Fútbol Internacional:</span> Los puntajes de los jugadores profesionales están basados en los valores y estadísticas oficiales proporcionados por el videojuego <span className="text-sky-300 font-bold">EA SPORTS FC 26</span>.
+              <span className="text-white font-bold">Fútbol Internacional:</span> Los puntajes de los jugadores profesionales se basan en las estadísticas oficiales del videojuego EA SPORTS FC 26.
             </div>
           </div>
 
@@ -71,7 +71,7 @@ export const InfoDisclaimerModal: React.FC<InfoDisclaimerModalProps> = ({
               <HeartHandshake className="w-4 h-4" />
             </div>
             <div className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans font-medium">
-              <span className="text-amber-300 font-bold">Liga de Salto:</span> Los valores asignados a los jugadores y personajes de la liga local son <span className="text-white font-bold">totalmente ficticios y recreativos</span>. Fueron creados con fines de entretenimiento, humor y cariño comunitario, sin intención de realizar juicios deportivos reales ni ofender a ninguna persona o institución.
+              <span className="text-amber-300 font-bold">Liga de Salto:</span> Los valores de los jugadores y personajes de la liga son ficticios y recreativos, creados exclusivamente con fines de entretenimiento y humor, sin intención de ofender ni realizar juicios deportivos reales.
             </div>
           </div>
 
