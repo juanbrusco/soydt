@@ -98,7 +98,6 @@ export const DtProfileCard: React.FC<DtProfileCardProps> = ({
               <form onSubmit={handleFormSubmit} className="flex items-center gap-2 mt-1">
                 <input
                   type="text"
-                  autoFocus
                   maxLength={25}
                   value={inputName}
                   onChange={(e) => setInputName(e.target.value.toUpperCase())}
