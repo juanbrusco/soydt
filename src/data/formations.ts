@@ -57,7 +57,8 @@ export const FORMATIONS: Record<GameMode, Formation[]> = {
         { id: 'slot-10', position: 'EI', label: 'EI', gridX: 20, gridY: 20 },
       ]
     }
-  ]
+  ],
+  TRIVIA: [],
 };
 
 export function getFormationsByMode(mode: GameMode): Formation[] {

@@ -439,6 +439,79 @@ export async function fetchLeaderboardTop3(): Promise<LeaderboardResponse> {
 }
 
 
+export async function fetchRandomTriviaQuestions(limit = 10): Promise<Array<{ id: number; question: string; optionA: string; optionB: string; correctOption: number }>> {
+  const sql = getSqlClient();
+  if (!sql) return [];
+
+  try {
+    const rows = await sql`
+      SELECT id, question, option_a, option_b, correct_option
+      FROM trivia_questions
+      WHERE active = TRUE
+      ORDER BY RANDOM()
+      LIMIT ${limit}
+    `;
+    return rows.map((r: any) => ({
+      id: Number(r.id),
+      question: String(r.question),
+      optionA: String(r.option_a),
+      optionB: String(r.option_b),
+      correctOption: Number(r.correct_option),
+    }));
+  } catch (error) {
+    console.error('[Neon DB] Error fetching trivia questions:', error);
+    return [];
+  }
+}
+
+export async function insertTriviaResult(params: {
+  playerName: string;
+  score: number;
+  timeSeconds: number;
+}): Promise<{ success: boolean; runId?: number; error?: string }> {
+  const sql = getSqlClient();
+  if (!sql) return { success: false, error: 'DATABASE_URL not configured' };
+
+  try {
+    await ensureTablesExist();
+    const cleanName = (params.playerName || 'DT ANÓNIMO').trim().slice(0, 50).toUpperCase();
+    const inserted = await sql`
+      INSERT INTO runs (player_name, mode, score, time_seconds, events_enabled)
+      VALUES (${cleanName}, 'TRIVIA', ${params.score}, ${params.timeSeconds}, false)
+      RETURNING id
+    `;
+    return { success: true, runId: Number(inserted[0]?.id) };
+  } catch (error) {
+    console.error('[Neon DB] Error inserting trivia result:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function fetchTriviaLeaderboard(limit = 10): Promise<Array<{ rank: number; playerName: string; score: number; timeSeconds: number }>> {
+  const sql = getSqlClient();
+  if (!sql) return [];
+
+  try {
+    await ensureTablesExist();
+    const rows = await sql`
+      SELECT player_name, score, time_seconds
+      FROM runs
+      WHERE mode = 'TRIVIA'
+      ORDER BY score DESC, time_seconds ASC
+      LIMIT ${limit}
+    `;
+    return rows.map((r: any, idx: number) => ({
+      rank: idx + 1,
+      playerName: String(r.player_name || 'DT').trim().toUpperCase(),
+      score: Number(r.score) || 0,
+      timeSeconds: Number(r.time_seconds) || 0,
+    }));
+  } catch (error) {
+    console.error('[Neon DB] Error fetching trivia leaderboard:', error);
+    return [];
+  }
+}
+
 export async function checkConnection(): Promise<{ connected: boolean; message: string }> {
   const sql = getSqlClient();
   if (!sql) {

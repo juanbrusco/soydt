@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, LeaderboardTop3Data, LeaderboardTop3Entry } from '../types/game';
-import { Trophy, Flame, ChevronDown, ChevronUp, RotateCw } from 'lucide-react';
-import { fetchLeaderboardTop3Async, DEFAULT_LEADERBOARD_TOP3 } from '../utils/globalRecords';
+import { Trophy, Flame, ChevronDown, ChevronUp, RotateCw, Brain, Clock } from 'lucide-react';
+import { fetchLeaderboardTop3Async, DEFAULT_LEADERBOARD_TOP3, fetchTriviaLeaderboardAsync } from '../utils/globalRecords';
 import { sound } from '../utils/audio';
+
+type ActiveTab = GameMode | 'TRIVIA';
 
 interface LeaderboardTop3CardProps {
   initialData?: LeaderboardTop3Data;
 }
 
+interface TriviaEntry { rank: number; playerName: string; score: number; timeSeconds: number }
+
 export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initialData }) => {
   const [data, setData] = useState<LeaderboardTop3Data>(initialData || DEFAULT_LEADERBOARD_TOP3);
-  const [activeMode, setActiveMode] = useState<GameMode>('FUTBOL11_SALTO');
+  const [triviaData, setTriviaData] = useState<TriviaEntry[]>([]);
+  const [activeMode, setActiveMode] = useState<ActiveTab>('FUTBOL11_SALTO');
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetchLeaderboardTop3Async();
-      setData(res);
+      const [lb, trivia] = await Promise.all([
+        fetchLeaderboardTop3Async(),
+        fetchTriviaLeaderboardAsync(),
+      ]);
+      setData(lb);
+      setTriviaData(trivia);
     } catch {
       // Ignore
     } finally {
@@ -30,7 +39,7 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
     loadData();
   }, []);
 
-  const currentList: LeaderboardTop3Entry[] = data[activeMode] || [];
+  const currentList: LeaderboardTop3Entry[] = activeMode !== 'TRIVIA' ? (data[activeMode as GameMode] || []) : [];
 
   const getRankBadge = (rank: number) => {
     switch (rank) {
@@ -152,6 +161,22 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
               FÚTBOL 11
             </button>
 
+            <button
+              id="tab-top3-trivia"
+              onClick={() => {
+                sound.playClick();
+                setActiveMode('TRIVIA');
+              }}
+              className={`flex-1 min-w-[80px] py-2 px-3 rounded-lg text-[12px] sm:text-xs font-bold uppercase tracking-wider transition-all text-center cursor-pointer flex items-center justify-center gap-1 ${
+                activeMode === 'TRIVIA'
+                  ? 'bg-violet-400 text-black shadow-md'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Brain className="w-3 h-3" />
+              TRIVIA
+            </button>
+
             {/*<button
               id="tab-top3-f5"
               onClick={() => {
@@ -168,56 +193,74 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
             </button>*/}
           </div>
 
-          {/* Minimalist Top 3 Podiums */}
+          {/* Entries */}
           <div className="space-y-2">
-            {currentList.map((entry) => (
-              <div
-                key={`${activeMode}-${entry.rank}-${entry.playerName}`}
-                className="px-3.5 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 flex items-center justify-between gap-3 transition-colors"
-              >
-                {/* Left: Rank + Player Name */}
-                <div className="flex items-center gap-3 min-w-0">
-                  {getRankBadge(entry.rank)}
-                  <div className="min-w-0">
-                    <span className=" font-bold text-xs sm:text-sm text-white uppercase tracking-wide truncate block">
-                      {entry.playerName}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right: Fueguito con color o tachado + Score */}
-                <div className="flex items-center gap-3 sm:gap-5 flex-shrink-0">
-                  {/* 2da Columna: Fueguito con color (activado) o tachado (desactivado) */}
-                  <div className="flex items-center justify-center">
-                    {entry.eventsEnabled ? (
-                      <div
-                        title="Quilombos activados"
-                        className="w-7 h-7 rounded-lg bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shadow-sm"
-                      >
-                        <Flame className="w-4 h-4 fill-orange-400/40 text-orange-400" />
+            {activeMode === 'TRIVIA' ? (
+              triviaData.length === 0 ? (
+                <p className="text-[11px] font-mono-code text-white/30 text-center py-3">Sin partidas registradas aún</p>
+              ) : (
+                triviaData.map((entry) => (
+                  <div
+                    key={`trivia-${entry.rank}-${entry.playerName}`}
+                    className="px-3.5 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 flex items-center justify-between gap-3 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {getRankBadge(entry.rank)}
+                      <span className="font-bold text-xs sm:text-sm text-white uppercase tracking-wide truncate">
+                        {entry.playerName}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="flex items-center gap-1 text-[#38BDF8]">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-mono-code text-white/50 tabular-nums">{entry.timeSeconds}s</span>
                       </div>
-                    ) : (
-                      <div
-                        title="Quilombos desactivados"
-                        className="w-7 h-7 rounded-lg bg-white/[0.03] border border-white/10 flex items-center justify-center relative opacity-50"
-                      >
-                        <Flame className="w-4 h-4 text-white/40" />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="w-5 h-[1.5px] bg-red-500/90 rotate-45 rounded-full shadow-sm" />
+                      <div className="text-right min-w-[50px]">
+                        <span className="text-sm sm:text-base font-black text-white">{entry.score}</span>
+                        <span className="text-[11px] text-white/40"> /10</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )
+            ) : (
+              currentList.map((entry) => (
+                <div
+                  key={`${activeMode}-${entry.rank}-${entry.playerName}`}
+                  className="px-3.5 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 flex items-center justify-between gap-3 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {getRankBadge(entry.rank)}
+                    <div className="min-w-0">
+                      <span className="font-bold text-xs sm:text-sm text-white uppercase tracking-wide truncate block">
+                        {entry.playerName}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:gap-5 flex-shrink-0">
+                    <div className="flex items-center justify-center">
+                      {entry.eventsEnabled ? (
+                        <div title="Quilombos activados" className="w-7 h-7 rounded-lg bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shadow-sm">
+                          <Flame className="w-4 h-4 fill-orange-400/40 text-orange-400" />
                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="text-right min-w-[70px]">
-                    <span className="text-sm sm:text-base font-black text-white">
-                      {entry.score}
-                    </span>{' '}
-                    <span className="text-[11px]  text-white/40">PTS</span>
+                      ) : (
+                        <div title="Quilombos desactivados" className="w-7 h-7 rounded-lg bg-white/[0.03] border border-white/10 flex items-center justify-center relative opacity-50">
+                          <Flame className="w-4 h-4 text-white/40" />
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-5 h-[1.5px] bg-red-500/90 rotate-45 rounded-full shadow-sm" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right min-w-[70px]">
+                      <span className="text-sm sm:text-base font-black text-white">{entry.score}</span>{' '}
+                      <span className="text-[11px] text-white/40">PTS</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}

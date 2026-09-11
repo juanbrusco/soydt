@@ -25,7 +25,21 @@ export interface Player {
   modifier?: number;
 }
 
-export type GameMode = 'FUTBOL11' | 'FUTBOL5' | 'FUTBOL11_SALTO';
+export type GameMode = 'FUTBOL11' | 'FUTBOL5' | 'FUTBOL11_SALTO' | 'TRIVIA';
+
+export interface TriviaQuestion {
+  id: number;
+  question: string;
+  options: [string, string];
+  correct: 0 | 1;
+}
+
+export interface TriviaResult {
+  correct: number;
+  total: number;
+  timeSeconds: number;
+  playerName: string;
+}
 
 export interface FormationSlot {
   id: string; // e.g. 'slot-0'
@@ -141,6 +155,7 @@ export interface AllRecords {
   FUTBOL11: ModeRecord | null;
   FUTBOL5: ModeRecord | null;
   FUTBOL11_SALTO?: ModeRecord | null;
+  TRIVIA?: ModeRecord | null;
 }
 
 export interface LeaderboardTop3Entry {
@@ -148,12 +163,14 @@ export interface LeaderboardTop3Entry {
   playerName: string;
   score: number;
   eventsEnabled: boolean;
+  timeSeconds?: number;
 }
 
 export interface LeaderboardTop3Data {
   FUTBOL11_SALTO: LeaderboardTop3Entry[];
   FUTBOL11: LeaderboardTop3Entry[];
   FUTBOL5: LeaderboardTop3Entry[];
+  TRIVIA?: LeaderboardTop3Entry[];
 }
 
 export interface FriendRoomEntry {

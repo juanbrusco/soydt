@@ -59,6 +59,7 @@ import { CodeModal } from './components/CodeModal';
 import { FinalSummary } from './components/FinalSummary';
 import { LoadingPlayersScreen } from './components/LoadingPlayersScreen';
 import { FriendRoomModal } from './components/FriendRoomModal';
+import { TriviaGame } from './components/TriviaGame';
 import { submitRoomEntryAsync } from './utils/friendRooms';
 import { sendGameStatSilently } from './utils/stats';
 import { Flame, Sparkles } from 'lucide-react';
@@ -71,7 +72,8 @@ export default function App() {
   const [eventsEnabled, setEventsEnabled] = useState<boolean>(true);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState<boolean>(false);
   const [records, setRecords] = useState<AllRecords>({ FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null });
-  const [lastRuns, setLastRuns] = useState<Record<GameMode, ModeRecord | null>>({ FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null });
+  const [lastRuns, setLastRuns] = useState<Record<GameMode, ModeRecord | null>>({ FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null });
+  const [isTriviaActive, setIsTriviaActive] = useState(false);
   const [recentRuns, setRecentRuns] = useState<RunHistoryItem[]>([]);
   const [globalRecords, setGlobalRecords] = useState(getGlobalGameRecords());
   const [currentNeonRunId, setCurrentNeonRunId] = useState<number | null>(null);
@@ -144,6 +146,7 @@ export default function App() {
 
   // Database Selectors based on GameMode
   const getPlayerDatabase = useCallback((mode: GameMode): Player[] => {
+    if (mode === 'TRIVIA') return [];
     if (mode === 'FUTBOL11_SALTO') {
       return dynamicSaltoPlayers.length > 0 ? dynamicSaltoPlayers : PLAYERS_SALTO_DB;
     }
@@ -295,6 +298,7 @@ export default function App() {
     setIsCalculatingScore(false);
     setPendingFinalData(null);
     setEventFeedback(null);
+    setIsTriviaActive(false);
     setIsHome(true);
   }, []);
 
@@ -1096,6 +1100,11 @@ export default function App() {
         {isHome ? (
           <HomeScreen
             onSelectMode={(mode) => {
+              if (mode === 'TRIVIA') {
+                setIsTriviaActive(true);
+                setIsHome(false);
+                return;
+              }
               setCurrentMode(mode);
               startNewRun(mode);
               setIsHome(false);
@@ -1113,6 +1122,11 @@ export default function App() {
             onSavePlayerName={handleSavePlayerName}
             recentRuns={recentRuns}
             playersSource={playersSource}
+          />
+        ) : isTriviaActive ? (
+          <TriviaGame
+            playerName={currentPlayerName}
+            onBack={handleGoHome}
           />
         ) : runState && !runState.isComplete ? (
           <div className="flex flex-col gap-2.5 sm:gap-6 w-full">

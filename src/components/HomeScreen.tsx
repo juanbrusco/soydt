@@ -3,18 +3,19 @@ import { GameMode, AllRecords, RunHistoryItem } from '../types/game';
 import { getGlobalGameRecords, GlobalRecordsMap } from '../utils/globalRecords';
 import { DtProfileCard } from './DtProfileCard';
 import { LeaderboardTop3Card } from './LeaderboardTop3Card';
-import { 
-  Users, 
-  Shield, 
-  Flag, 
-  MapPin, 
-  Play, 
-  Lock, 
-  Trophy, 
-  KeyRound, 
-  Flame, 
+import {
+  Users,
+  Shield,
+  Flag,
+  MapPin,
+  Play,
+  Lock,
+  Trophy,
+  KeyRound,
+  Flame,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Brain
 } from 'lucide-react';
 import { sound } from '../utils/audio';
 
@@ -195,8 +196,42 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         </div>
 
+        {/* TRIVIA */}
+        <div
+          onClick={() => handleSelect('TRIVIA')}
+          className="group relative rounded-2xl p-5 sm:p-6 bg-[#0a0a0a] border border-white/15 hover:border-violet-400/60 transition-all duration-300 shadow-xl flex flex-col justify-between cursor-pointer hover:shadow-[0_0_30px_rgba(167,139,250,0.15)] hover:bg-[#0d0d0d] active:scale-[0.99]"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-400/40 to-transparent group-hover:via-violet-400 transition-all" />
+
+          <div>
+            <h3 className="text-2xl font-black uppercase font-display tracking-tight text-white group-hover:text-violet-400 transition-colors mb-1 flex items-center gap-2">
+              <Brain className="w-6 h-6" />
+              TRIVIA
+            </h3>
+            <p className="text-[12px] text-white/40 mb-4">Demostrá cuánto sabes de fútbol</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              <span className="text-[11px] font-mono-code font-bold uppercase px-2.5 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300">
+                10 PREGUNTAS
+              </span>
+              <span className="text-[11px] font-mono-code font-bold uppercase px-2.5 py-1 rounded bg-white/[0.04] border border-white/10 text-white/80">
+                90 SEG
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+            <span className="text-[11px] font-mono-code text-white/30 uppercase tracking-wider">
+              RANKING POR ACIERTOS + TIEMPO
+            </span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black group-hover:bg-violet-400 group-hover:text-black font-black font-display text-xs uppercase tracking-wider transition-all shadow-md">
+              <span>JUGAR</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
+
         {/* 2. FÚTBOL 5 (ACTIVO) */}
-        {/*<div 
+        {/*<div
           onClick={() => handleSelect('FUTBOL5')}
           className="group relative rounded-2xl p-5 sm:p-6 bg-[#0a0a0a] border border-white/15 hover:border-[#38BDF8]/60 transition-all duration-300 shadow-xl flex flex-col justify-between cursor-pointer hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] hover:bg-[#0d0d0d] active:scale-[0.99]"
         >

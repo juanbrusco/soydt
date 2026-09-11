@@ -24,6 +24,10 @@ export const DEFAULT_GLOBAL_RECORDS: GlobalRecordsMap = {
     score: 472,
     holder: 'SANTINO M.',
   },
+  TRIVIA: {
+    score: 0,
+    holder: '-',
+  },
 };
 
 // Caché en memoria para lectura sincrónica inmediata en la UI
@@ -192,6 +196,30 @@ export async function fetchLeaderboardTop3Async(): Promise<LeaderboardTop3Data> 
   } catch (err) {
     console.error('Error fetching leaderboard top 3:', err);
     return DEFAULT_LEADERBOARD_TOP3;
+  }
+}
+
+export async function submitTriviaResult(playerName: string, score: number, timeSeconds: number): Promise<void> {
+  try {
+    await fetch('/api/trivia/result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerName, score, timeSeconds }),
+    });
+  } catch (err) {
+    console.error('Error submitting trivia result:', err);
+  }
+}
+
+export async function fetchTriviaLeaderboardAsync(): Promise<Array<{ rank: number; playerName: string; score: number; timeSeconds: number }>> {
+  try {
+    const res = await fetch('/api/trivia/leaderboard');
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.entries || [];
+  } catch (err) {
+    console.error('Error fetching trivia leaderboard:', err);
+    return [];
   }
 }
 

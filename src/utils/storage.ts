@@ -132,10 +132,10 @@ export function getRankingTier(score: number, totalSlots: number = 11, mode?: Ga
 export function loadRecords(): AllRecords {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_RECORDS);
-    if (!raw) return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null };
+    if (!raw) return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null };
     return JSON.parse(raw);
   } catch {
-    return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null };
+    return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null };
   }
 }
 
@@ -163,10 +163,10 @@ export function saveRecordIfBetter(mode: GameMode, score: number, runCode: strin
 export function loadLastRuns(): Record<GameMode, ModeRecord | null> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_LAST_RUNS);
-    if (!raw) return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null };
+    if (!raw) return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null };
     return JSON.parse(raw);
   } catch {
-    return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null };
+    return { FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null };
   }
 }
 

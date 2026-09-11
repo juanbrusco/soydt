@@ -1,11 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { 
-  fetchGlobalMaxRecords, 
-  insertGameRecord, 
-  updateRunPlayerName, 
-  getRecentRunsForPlayer, 
-  fetchLeaderboardTop3, 
+  fetchGlobalMaxRecords,
+  insertGameRecord,
+  updateRunPlayerName,
+  getRecentRunsForPlayer,
+  fetchLeaderboardTop3,
   checkConnection,
   fetchPlayersFromDb,
   createFriendRoom,
@@ -13,7 +13,10 @@ import {
   addFriendRoomEntry,
   deleteFriendRoom,
   saveGameStat,
-  getGameStats
+  getGameStats,
+  insertTriviaResult,
+  fetchTriviaLeaderboard,
+  fetchRandomTriviaQuestions,
 } from './db';
 
 dotenv.config();
@@ -260,6 +263,38 @@ export function createExpressApp() {
       res.json({ success: true, stats });
     } catch (err: any) {
       res.json({ success: false, stats: [] });
+    }
+  });
+
+  apiRouter.get('/trivia/questions', async (_req, res) => {
+    try {
+      const questions = await fetchRandomTriviaQuestions(10);
+      res.json({ success: true, questions });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error obteniendo preguntas' });
+    }
+  });
+
+  apiRouter.post('/trivia/result', async (req, res) => {
+    try {
+      const { playerName, score, timeSeconds } = req.body || {};
+      if (!playerName || typeof score !== 'number' || typeof timeSeconds !== 'number') {
+        res.status(400).json({ error: 'playerName, score y timeSeconds son requeridos.' });
+        return;
+      }
+      const result = await insertTriviaResult({ playerName, score, timeSeconds });
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error guardando resultado de trivia' });
+    }
+  });
+
+  apiRouter.get('/trivia/leaderboard', async (_req, res) => {
+    try {
+      const entries = await fetchTriviaLeaderboard(10);
+      res.json({ success: true, entries });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error obteniendo leaderboard de trivia' });
     }
   });
 
