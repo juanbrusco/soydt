@@ -245,41 +245,20 @@ class SoundEngine {
     const ctx = this.getContext();
     if (!ctx) return;
 
-    // Crowd roar: white noise burst filtered as bandpass
-    const bufferSize = Math.floor(ctx.sampleRate * 1.6);
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 700;
-    filter.Q.value = 0.4;
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0, ctx.currentTime);
-    noiseGain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.25);
-    noiseGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 1.1);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.6);
-    noise.connect(filter);
-    filter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
-    noise.start();
-    noise.stop(ctx.currentTime + 1.6);
-
-    // 8-bit ascending fanfare
-    [330, 440, 523.25, 659.25, 880, 1046.5].forEach((freq, idx) => {
+    // Mario-style power-up: staccato square wave ascending arpeggio
+    const notes = [329.63, 415.30, 523.25, 659.25, 830.61, 1046.5, 1318.51, 1661.22];
+    notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'square';
-      const t = ctx.currentTime + 0.05 + idx * 0.09;
+      const t = ctx.currentTime + idx * 0.065;
       osc.frequency.setValueAtTime(freq, t);
-      gain.gain.setValueAtTime(0.13, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      gain.gain.setValueAtTime(0.10, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.22);
+      osc.stop(t + 0.055);
     });
   }
 
