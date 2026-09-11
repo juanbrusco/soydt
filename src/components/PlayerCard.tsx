@@ -29,6 +29,15 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   currentMode
 }) => {
   const [scrambledName, setScrambledName] = useState<string>('');
+  const [showSpecialOverlay, setShowSpecialOverlay] = useState(false);
+
+  useEffect(() => {
+    if (!player?.special) return;
+    setShowSpecialOverlay(true);
+    sound.playGoalRoar();
+    const t = setTimeout(() => setShowSpecialOverlay(false), 2800);
+    return () => clearTimeout(t);
+  }, [player?.id]);
 
   // Scramble text effect on player appearance / reroll
   useEffect(() => {
@@ -61,6 +70,60 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       setScrambledName(player.name);
     }
   }, [player?.id, player?.name, isRolling]);
+
+  if (showSpecialOverlay && player) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 cursor-pointer"
+        onClick={() => setShowSpecialOverlay(false)}
+      >
+        {/* scanlines */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)',
+          }}
+        />
+        <div
+          className="relative flex flex-col items-center gap-5 px-10 py-8 animate-fadeIn"
+          style={{
+            border: '4px solid #f59e0b',
+            boxShadow: '0 0 0 2px #000, 0 0 0 4px #f59e0b, 0 0 60px rgba(245,158,11,0.35)',
+            background: '#000',
+          }}
+        >
+          <span className="text-6xl animate-bounce">⚽</span>
+
+          <p
+            className="font-mono-code font-black text-amber-400 text-xs tracking-[0.35em] uppercase text-center"
+            style={{ textShadow: '0 0 10px rgba(245,158,11,0.8)' }}
+          >
+            ★ LEYENDA ★
+          </p>
+
+          <div className="w-full h-[2px] bg-amber-400/50" />
+
+          <p className="font-mono-code font-black text-white text-2xl uppercase tracking-wider text-center leading-tight">
+            {player.name}
+          </p>
+
+          <p
+            className="font-mono-code font-black text-amber-400 text-5xl"
+            style={{ textShadow: '0 0 20px rgba(245,158,11,0.7)' }}
+          >
+            {player.ovr}
+          </p>
+
+          <div className="w-full h-[2px] bg-amber-400/50" />
+
+          <p className="font-mono-code text-white/30 text-[11px] uppercase tracking-[0.3em] animate-pulse">
+            TOCA PARA CONTINUAR
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!player) {
     return (

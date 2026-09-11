@@ -27,7 +27,7 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
         fetchTriviaLeaderboardAsync(),
       ]);
       setData(lb);
-      setTriviaData(trivia);
+      setTriviaData(trivia.slice(0, 3));
     } catch {
       // Ignore
     } finally {

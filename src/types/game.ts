@@ -23,6 +23,7 @@ export interface Player {
   emoji?: string;
   source?: PlayerSource;
   modifier?: number;
+  special?: boolean;
 }
 
 export type GameMode = 'FUTBOL11' | 'FUTBOL5' | 'FUTBOL11_SALTO' | 'TRIVIA';

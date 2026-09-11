@@ -546,6 +546,7 @@ export interface DbPlayer {
   country: string;
   nationality: string;
   dataset?: string;
+  special?: boolean;
 }
 
 const PLAYERS_CACHE: {
@@ -612,10 +613,11 @@ export async function fetchPlayersFromDb(
           primary_position AS "primaryPosition", 
           position, 
           club, 
-          COALESCE(emoji, '') AS emoji, 
-          COALESCE(country, '') AS country, 
+          COALESCE(emoji, '') AS emoji,
+          COALESCE(country, '') AS country,
           COALESCE(nationality, '') AS nationality,
-          COALESCE(dataset, 'SALTO') AS dataset
+          COALESCE(dataset, 'SALTO') AS dataset,
+          COALESCE(special, FALSE) AS special
         FROM players
         WHERE dataset = 'SALTO' OR id LIKE 'salto_%'
         ORDER BY ovr DESC, name ASC;
@@ -629,10 +631,11 @@ export async function fetchPlayersFromDb(
           primary_position AS "primaryPosition", 
           position, 
           club, 
-          COALESCE(emoji, '') AS emoji, 
-          COALESCE(country, '') AS country, 
+          COALESCE(emoji, '') AS emoji,
+          COALESCE(country, '') AS country,
           COALESCE(nationality, '') AS nationality,
-          COALESCE(dataset, 'GLOBAL') AS dataset
+          COALESCE(dataset, 'GLOBAL') AS dataset,
+          COALESCE(special, FALSE) AS special
         FROM players
         WHERE (dataset = 'GLOBAL' OR dataset IS NULL) AND id NOT LIKE 'salto_%'
         ORDER BY ovr DESC, name ASC;
@@ -646,10 +649,11 @@ export async function fetchPlayersFromDb(
           primary_position AS "primaryPosition", 
           position, 
           club, 
-          COALESCE(emoji, '') AS emoji, 
-          COALESCE(country, '') AS country, 
+          COALESCE(emoji, '') AS emoji,
+          COALESCE(country, '') AS country,
           COALESCE(nationality, '') AS nationality,
-          COALESCE(dataset, 'GLOBAL') AS dataset
+          COALESCE(dataset, 'GLOBAL') AS dataset,
+          COALESCE(special, FALSE) AS special
         FROM players
         ORDER BY ovr DESC, name ASC;
       `;
@@ -666,6 +670,7 @@ export async function fetchPlayersFromDb(
       country: String(r.country || ''),
       nationality: String(r.nationality || ''),
       dataset: String(r.dataset || ''),
+      special: Boolean(r.special),
     }));
 
     // Actualizar caché

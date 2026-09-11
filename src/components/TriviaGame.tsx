@@ -18,12 +18,15 @@ async function fetchQuestions(): Promise<TriviaQuestion[]> {
   const res = await fetch('/api/trivia/questions');
   if (!res.ok) throw new Error('Error al cargar preguntas');
   const data = await res.json();
-  return (data.questions || []).map((q: any) => ({
-    id: q.id,
-    question: q.question,
-    options: [q.optionA, q.optionB] as [string, string],
-    correct: q.correctOption as 0 | 1,
-  }));
+  return (data.questions || []).map((q: any) => {
+    const swap = Math.random() < 0.5;
+    return {
+      id: q.id,
+      question: q.question,
+      options: swap ? [q.optionB, q.optionA] : [q.optionA, q.optionB] as [string, string],
+      correct: (swap ? 1 - q.correctOption : q.correctOption) as 0 | 1,
+    };
+  });
 }
 
 export const TriviaGame: React.FC<Props> = ({ playerName, onBack }) => {
