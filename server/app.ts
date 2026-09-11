@@ -17,6 +17,8 @@ import {
   insertTriviaResult,
   fetchTriviaLeaderboard,
   fetchRandomTriviaQuestions,
+  insertMayorOMenorResult,
+  fetchMayorOMenorLeaderboard,
 } from './db';
 
 dotenv.config();
@@ -295,6 +297,30 @@ export function createExpressApp() {
       res.json({ success: true, entries });
     } catch (err: any) {
       res.status(500).json({ error: err?.message || 'Error obteniendo leaderboard de trivia' });
+    }
+  });
+
+  apiRouter.post('/mayor-o-menor/result', async (req, res) => {
+    try {
+      const { playerName, streak, dataset } = req.body || {};
+      if (typeof streak !== 'number' || !['GLOBAL', 'SALTO'].includes(dataset)) {
+        res.status(400).json({ error: 'streak y dataset (GLOBAL|SALTO) son requeridos.' });
+        return;
+      }
+      const result = await insertMayorOMenorResult({ playerName, streak, dataset });
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error guardando resultado de mayor o menor' });
+    }
+  });
+
+  apiRouter.get('/mayor-o-menor/leaderboard', async (req, res) => {
+    try {
+      const dataset = (req.query.dataset as string) === 'SALTO' ? 'SALTO' : 'GLOBAL';
+      const entries = await fetchMayorOMenorLeaderboard(dataset, 10);
+      res.json({ success: true, entries });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error obteniendo leaderboard de mayor o menor' });
     }
   });
 

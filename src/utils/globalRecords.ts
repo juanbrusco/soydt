@@ -223,6 +223,30 @@ export async function fetchTriviaLeaderboardAsync(): Promise<Array<{ rank: numbe
   }
 }
 
+export async function submitMayorOMenorResult(playerName: string, streak: number, dataset: 'GLOBAL' | 'SALTO'): Promise<void> {
+  try {
+    await fetch('/api/mayor-o-menor/result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerName, streak, dataset }),
+    });
+  } catch (err) {
+    console.error('Error submitting mayor o menor result:', err);
+  }
+}
+
+export async function fetchMayorOMenorLeaderboardAsync(dataset: 'GLOBAL' | 'SALTO'): Promise<Array<{ rank: number; playerName: string; streak: number }>> {
+  try {
+    const res = await fetch(`/api/mayor-o-menor/leaderboard?dataset=${dataset}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.entries || [];
+  } catch (err) {
+    console.error('Error fetching mayor o menor leaderboard:', err);
+    return [];
+  }
+}
+
 /**
  * Consulta las últimas partidas del DT desde Neon.
  */

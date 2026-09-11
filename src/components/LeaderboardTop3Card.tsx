@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, LeaderboardTop3Data, LeaderboardTop3Entry } from '../types/game';
-import { Trophy, Flame, ChevronDown, ChevronUp, RotateCw, Brain, Clock } from 'lucide-react';
-import { fetchLeaderboardTop3Async, DEFAULT_LEADERBOARD_TOP3, fetchTriviaLeaderboardAsync } from '../utils/globalRecords';
+import { Trophy, Flame, ChevronDown, ChevronUp, RotateCw, Brain, Clock, TrendingUp } from 'lucide-react';
+import { fetchLeaderboardTop3Async, DEFAULT_LEADERBOARD_TOP3, fetchTriviaLeaderboardAsync, fetchMayorOMenorLeaderboardAsync } from '../utils/globalRecords';
 import { sound } from '../utils/audio';
 
-type ActiveTab = GameMode | 'TRIVIA';
+type ActiveTab = GameMode | 'TRIVIA' | 'MAYOR_MENOR';
+type MayorOMenorDataset = 'GLOBAL' | 'SALTO';
 
 interface LeaderboardTop3CardProps {
   initialData?: LeaderboardTop3Data;
 }
 
 interface TriviaEntry { rank: number; playerName: string; score: number; timeSeconds: number }
+interface MayorOMenorEntry { rank: number; playerName: string; streak: number }
 
 export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initialData }) => {
   const [data, setData] = useState<LeaderboardTop3Data>(initialData || DEFAULT_LEADERBOARD_TOP3);
   const [triviaData, setTriviaData] = useState<TriviaEntry[]>([]);
+  const [mayorData, setMayorData] = useState<Record<MayorOMenorDataset, MayorOMenorEntry[]>>({ GLOBAL: [], SALTO: [] });
+  const [mayorDataset, setMayorDataset] = useState<MayorOMenorDataset>('GLOBAL');
   const [activeMode, setActiveMode] = useState<ActiveTab>('FUTBOL11_SALTO');
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -22,12 +26,15 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [lb, trivia] = await Promise.all([
+      const [lb, trivia, mayorGlobal, mayorSalto] = await Promise.all([
         fetchLeaderboardTop3Async(),
         fetchTriviaLeaderboardAsync(),
+        fetchMayorOMenorLeaderboardAsync('GLOBAL'),
+        fetchMayorOMenorLeaderboardAsync('SALTO'),
       ]);
       setData(lb);
       setTriviaData(trivia.slice(0, 3));
+      setMayorData({ GLOBAL: mayorGlobal.slice(0, 3), SALTO: mayorSalto.slice(0, 3) });
     } catch {
       // Ignore
     } finally {
@@ -39,7 +46,7 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
     loadData();
   }, []);
 
-  const currentList: LeaderboardTop3Entry[] = activeMode !== 'TRIVIA' ? (data[activeMode as GameMode] || []) : [];
+  const currentList: LeaderboardTop3Entry[] = (activeMode !== 'TRIVIA' && activeMode !== 'MAYOR_MENOR') ? (data[activeMode as GameMode] || []) : [];
 
   const getRankBadge = (rank: number) => {
     switch (rank) {
@@ -177,6 +184,22 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
               TRIVIA
             </button>
 
+            <button
+              id="tab-top3-mayor"
+              onClick={() => {
+                sound.playClick();
+                setActiveMode('MAYOR_MENOR');
+              }}
+              className={`flex-1 min-w-[80px] py-2 px-3 rounded-lg text-[12px] sm:text-xs font-bold uppercase tracking-wider transition-all text-center cursor-pointer flex items-center justify-center gap-1 ${
+                activeMode === 'MAYOR_MENOR'
+                  ? 'bg-emerald-400 text-black shadow-md'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <TrendingUp className="w-3 h-3" />
+              MAY/MEN
+            </button>
+
             {/*<button
               id="tab-top3-f5"
               onClick={() => {
@@ -195,7 +218,44 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
 
           {/* Entries */}
           <div className="space-y-2">
-            {activeMode === 'TRIVIA' ? (
+            {activeMode === 'MAYOR_MENOR' ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-1.5 p-1 bg-black/40 rounded-lg border border-white/5">
+                  {(['GLOBAL', 'SALTO'] as MayorOMenorDataset[]).map(d => (
+                    <button
+                      key={d}
+                      onClick={() => { sound.playClick(); setMayorDataset(d); }}
+                      className={`flex-1 py-1.5 rounded text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        mayorDataset === d ? 'bg-emerald-400 text-black' : 'text-white/50 hover:text-white'
+                      }`}
+                    >
+                      {d === 'GLOBAL' ? '🌍 Global' : '⚽ Salto'}
+                    </button>
+                  ))}
+                </div>
+                {mayorData[mayorDataset].length === 0 ? (
+                  <p className="text-[11px] font-mono-code text-white/30 text-center py-3">Sin partidas registradas aún</p>
+                ) : (
+                  mayorData[mayorDataset].map((entry) => (
+                    <div
+                      key={`mayor-${mayorDataset}-${entry.rank}-${entry.playerName}`}
+                      className="px-3.5 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 flex items-center justify-between gap-3 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {getRankBadge(entry.rank)}
+                        <span className="font-bold text-xs sm:text-sm text-white uppercase tracking-wide truncate">
+                          {entry.playerName}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm sm:text-base font-black text-white">{entry.streak}</span>
+                        <span className="text-[11px] text-white/40"> racha</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : activeMode === 'TRIVIA' ? (
               triviaData.length === 0 ? (
                 <p className="text-[11px] font-mono-code text-white/30 text-center py-3">Sin partidas registradas aún</p>
               ) : (

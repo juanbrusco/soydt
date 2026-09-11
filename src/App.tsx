@@ -60,6 +60,7 @@ import { FinalSummary } from './components/FinalSummary';
 import { LoadingPlayersScreen } from './components/LoadingPlayersScreen';
 import { FriendRoomModal } from './components/FriendRoomModal';
 import { TriviaGame } from './components/TriviaGame';
+import { MayorOMenorGame } from './components/MayorOMenorGame';
 import { submitRoomEntryAsync } from './utils/friendRooms';
 import { sendGameStatSilently } from './utils/stats';
 import { Flame, Sparkles } from 'lucide-react';
@@ -74,6 +75,7 @@ export default function App() {
   const [records, setRecords] = useState<AllRecords>({ FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null });
   const [lastRuns, setLastRuns] = useState<Record<GameMode, ModeRecord | null>>({ FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null });
   const [isTriviaActive, setIsTriviaActive] = useState(false);
+  const [isMayorOMenorActive, setIsMayorOMenorActive] = useState(false);
   const [recentRuns, setRecentRuns] = useState<RunHistoryItem[]>([]);
   const [globalRecords, setGlobalRecords] = useState(getGlobalGameRecords());
   const [currentNeonRunId, setCurrentNeonRunId] = useState<number | null>(null);
@@ -299,6 +301,7 @@ export default function App() {
     setPendingFinalData(null);
     setEventFeedback(null);
     setIsTriviaActive(false);
+    setIsMayorOMenorActive(false);
     setIsHome(true);
   }, []);
 
@@ -1110,6 +1113,10 @@ export default function App() {
               setIsHome(false);
             }}
             onOpenCodeModal={() => setIsCodeModalOpen(true)}
+            onMayorOMenor={() => {
+              setIsMayorOMenorActive(true);
+              setIsHome(false);
+            }}
             onOpenFriendRooms={(code) => {
               if (code) setFriendRoomInitialCode(code);
               setIsFriendRoomModalOpen(true);
@@ -1125,6 +1132,11 @@ export default function App() {
           />
         ) : isTriviaActive ? (
           <TriviaGame
+            playerName={currentPlayerName}
+            onBack={handleGoHome}
+          />
+        ) : isMayorOMenorActive ? (
+          <MayorOMenorGame
             playerName={currentPlayerName}
             onBack={handleGoHome}
           />

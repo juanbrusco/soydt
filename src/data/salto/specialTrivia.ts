@@ -40,8 +40,8 @@ export const SPECIAL_FOOTBALL_TRIVIA: WorldFootballTrivia[] = [
   {
     id: "trivia_3",
     question: "¿En qué año se fundó Sports?",
-    correctAnswer: "1922",
-    wrongAnswer: "1921"
+    correctAnswer: "1921",
+    wrongAnswer: "1922"
   },
   {
     id: "trivia_4",

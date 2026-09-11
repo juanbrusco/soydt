@@ -512,6 +512,55 @@ export async function fetchTriviaLeaderboard(limit = 10): Promise<Array<{ rank: 
   }
 }
 
+export async function insertMayorOMenorResult(params: {
+  playerName: string;
+  streak: number;
+  dataset: 'GLOBAL' | 'SALTO';
+}): Promise<{ success: boolean; runId?: number; error?: string }> {
+  const sql = getSqlClient();
+  if (!sql) return { success: false, error: 'DATABASE_URL not configured' };
+
+  try {
+    await ensureTablesExist();
+    const cleanName = (params.playerName || 'DT ANÓNIMO').trim().slice(0, 50).toUpperCase();
+    const mode = `MAYOR_MENOR_${params.dataset}`;
+    const inserted = await sql`
+      INSERT INTO runs (player_name, mode, score, time_seconds, events_enabled)
+      VALUES (${cleanName}, ${mode}, ${params.streak}, 0, false)
+      RETURNING id
+    `;
+    return { success: true, runId: Number(inserted[0]?.id) };
+  } catch (error) {
+    console.error('[Neon DB] Error inserting mayor o menor result:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function fetchMayorOMenorLeaderboard(dataset: 'GLOBAL' | 'SALTO', limit = 10): Promise<Array<{ rank: number; playerName: string; streak: number }>> {
+  const sql = getSqlClient();
+  if (!sql) return [];
+
+  try {
+    await ensureTablesExist();
+    const mode = `MAYOR_MENOR_${dataset}`;
+    const rows = await sql`
+      SELECT player_name, score
+      FROM runs
+      WHERE mode = ${mode}
+      ORDER BY score DESC
+      LIMIT ${limit}
+    `;
+    return rows.map((r: any, idx: number) => ({
+      rank: idx + 1,
+      playerName: String(r.player_name || 'DT').trim().toUpperCase(),
+      streak: Number(r.score) || 0,
+    }));
+  } catch (error) {
+    console.error('[Neon DB] Error fetching mayor o menor leaderboard:', error);
+    return [];
+  }
+}
+
 export async function checkConnection(): Promise<{ connected: boolean; message: string }> {
   const sql = getSqlClient();
   if (!sql) {
