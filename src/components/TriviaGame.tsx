@@ -79,11 +79,11 @@ export const TriviaGame: React.FC<Props> = ({ playerName, onBack }) => {
     const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
 
     submitTriviaResult(playerName, correct, elapsed).then(() => {
-      setLoadingLb(true);
-      fetchTriviaLeaderboardAsync().then(entries => {
-        setLeaderboard(entries);
-        setLoadingLb(false);
-      });
+      setLoadingLb(false);
+      // fetchTriviaLeaderboardAsync().then(entries => {
+      //   setLeaderboard(entries);
+      //   setLoadingLb(false);
+      // });
     });
   }, [finished, answers, playerName, questions]);
 
@@ -174,7 +174,7 @@ export const TriviaGame: React.FC<Props> = ({ playerName, onBack }) => {
             </div>
           </div>
 
-          <div className="w-full rounded-xl bg-white/[0.03] border border-white/10 p-3 flex flex-col gap-2">
+          {/* <div className="w-full rounded-xl bg-white/[0.03] border border-white/10 p-3 flex flex-col gap-2">
             {questions.map((q, i) => {
               const a = answers[i];
               const isCorrect = a === q.correct;
@@ -193,10 +193,10 @@ export const TriviaGame: React.FC<Props> = ({ playerName, onBack }) => {
                 </div>
               );
             })}
-          </div>
+          </div> */}
         </div>
 
-        <div className="rounded-2xl bg-[#0a0a0a] border border-white/10 p-4 shadow-xl">
+        {/* <div className="rounded-2xl bg-[#0a0a0a] border border-white/10 p-4 shadow-xl">
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-amber-400" />
             <span className="text-[11px] font-mono-code font-bold uppercase tracking-[0.2em] text-white/60">
@@ -232,7 +232,7 @@ export const TriviaGame: React.FC<Props> = ({ playerName, onBack }) => {
               })}
             </div>
           )}
-        </div>
+        </div> */}
 
         <button
           onClick={onBack}
