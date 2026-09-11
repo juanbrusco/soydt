@@ -4,8 +4,8 @@ import { Trophy, Clock, ArrowLeft, CheckCircle, XCircle, RotateCw, Brain } from 
 import { sound } from '../utils/audio';
 import { submitTriviaResult, fetchTriviaLeaderboardAsync } from '../utils/globalRecords';
 
-const TIMER_SECONDS = 15;
-const QUESTIONS_COUNT = 12;
+const TIMER_SECONDS = 10;
+const QUESTIONS_COUNT = 10;
 
 interface LeaderboardEntry { rank: number; playerName: string; score: number; timeSeconds: number }
 

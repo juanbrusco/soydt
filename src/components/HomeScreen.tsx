@@ -216,10 +216,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <p className="text-[12px] text-white/40 mb-4">Demostrá cuánto sabes de fútbol</p>
             <div className="flex flex-wrap gap-2 mb-5">
               <span className="text-[11px] font-mono-code font-bold uppercase px-2.5 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300">
-                12 PREGUNTAS
+                10 PREGUNTAS
               </span>
               <span className="text-[11px] font-mono-code font-bold uppercase px-2.5 py-1 rounded bg-white/[0.04] border border-white/10 text-white/80">
-                15 SEG
+                10 SEG
               </span>
             </div>
           </div>
