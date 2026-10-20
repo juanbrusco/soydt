@@ -1,0 +1,12 @@
+[
+  {"id": 1, "equipo": "Boca Juniors", "liga": "Liga Profesional Argentina"},
+  {"id": 2, "equipo": "River Plate", "liga": "Liga Profesional Argentina"},
+  {"id": 3, "equipo": "Independiente", "liga": "Liga Profesional Argentina"},
+  {"id": 4, "equipo": "Real Madrid", "liga": "LaLiga"},
+  {"id": 5, "equipo": "FC Barcelona", "liga": "LaLiga"},
+  {"id": 6, "equipo": "Manchester United", "liga": "Premier League"},
+  {"id": 7, "equipo": "Liverpool", "liga": "Premier League"},
+  {"id": 8, "equipo": "Juventus", "liga": "Serie A"},
+  {"id": 9, "equipo": "AC Milan", "liga": "Serie A"},
+  {"id": 10, "equipo": "Bayern Múnich", "liga": "Bundesliga"}
+]

@@ -218,6 +218,25 @@ class SoundEngine {
     osc.stop(ctx.currentTime + 0.03);
   }
 
+  // Beep agudo de cuenta regresiva tipo bomba; `final` = último segundo, más agudo
+  public playBombBeep(final = false) {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(final ? 1760 : 1320, ctx.currentTime);
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.15);
+  }
+
   public playSuccess() {
     if (this.isMuted) return;
     const ctx = this.getContext();

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "/home/juanbrusco/.local/bin/codegraph",
+      "args": ["serve", "--mcp"]
+    }
+  }
+}

@@ -19,6 +19,9 @@ import {
   fetchRandomTriviaQuestions,
   insertMayorOMenorResult,
   fetchMayorOMenorLeaderboard,
+  insertTeamYearResult,
+  fetchTeamYearTeams,
+  fetchTeamYearLeaderboard,
 } from './db';
 
 dotenv.config();
@@ -321,6 +324,34 @@ export function createExpressApp() {
       res.json({ success: true, entries });
     } catch (err: any) {
       res.status(500).json({ error: err?.message || 'Error obteniendo leaderboard de mayor o menor' });
+    }
+  });
+
+  apiRouter.get('/team-year/teams', async (_req, res) => {
+    const teams = await fetchTeamYearTeams();
+    res.json({ success: true, teams });
+  });
+
+  apiRouter.post('/team-year/result', async (req, res) => {
+    try {
+      const { playerName, score } = req.body || {};
+      if (!playerName || typeof score !== 'number') {
+        res.status(400).json({ error: 'playerName y score son requeridos.' });
+        return;
+      }
+      const result = await insertTeamYearResult({ playerName: String(playerName), score });
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error guardando resultado de equipo y año' });
+    }
+  });
+
+  apiRouter.get('/team-year/leaderboard', async (_req, res) => {
+    try {
+      const entries = await fetchTeamYearLeaderboard(10);
+      res.json({ success: true, entries });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || 'Error obteniendo leaderboard de equipo y año' });
     }
   });
 

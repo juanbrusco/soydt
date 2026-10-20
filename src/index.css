@@ -28,6 +28,18 @@
   letter-spacing: -0.05em;
 } */
 
+@keyframes teamyear-photo-in {
+  0% { opacity: 0; transform: scale(1.15); filter: blur(12px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes teamyear-banner {
+  0% { opacity: 0; transform: translateX(-100%); }
+  20%, 70% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+.animate-teamyear-photo-in { animation: teamyear-photo-in 0.5s ease-out; }
+.animate-teamyear-banner { animation: teamyear-banner 1.2s ease-in-out forwards; }
+
 @keyframes pulse-sky-glow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.1);

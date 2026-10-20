@@ -16,7 +16,8 @@ import {
   Sparkles,
   ArrowRight,
   Brain,
-  TrendingUp
+  TrendingUp,
+  Clock
 } from 'lucide-react';
 import { sound } from '../utils/audio';
 
@@ -25,6 +26,7 @@ interface HomeScreenProps {
   onOpenCodeModal: () => void;
   onOpenFriendRooms: (initialCode?: string) => void;
   onMayorOMenor: () => void;
+  onTeamYear: () => void;
   records: AllRecords;
   eventsEnabled: boolean;
   onToggleEvents: () => void;
@@ -40,6 +42,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenCodeModal,
   onOpenFriendRooms,
   onMayorOMenor,
+  onTeamYear,
   records,
   eventsEnabled,
   onToggleEvents,
@@ -49,7 +52,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   recentRuns,
   playersSource,
 }) => {
-  const [pendingAction, setPendingAction] = useState<GameMode | 'FRIEND_ROOMS' | 'MAYOR_MENOR' | null>(null);
+  const [pendingAction, setPendingAction] = useState<GameMode | 'FRIEND_ROOMS' | 'MAYOR_MENOR' | 'TEAM_YEAR' | null>(null);
 
   const canContinue = playerName.trim() !== '' && playerName.trim().toUpperCase() !== 'DT';
 
@@ -69,6 +72,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       onOpenFriendRooms();
     } else if (pendingAction === 'MAYOR_MENOR') {
       onMayorOMenor();
+    } else if (pendingAction === 'TEAM_YEAR') {
+      onTeamYear();
     } else {
       onSelectMode(pendingAction);
     }
@@ -263,6 +268,40 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               RANKING POR RACHA MÁXIMA
             </span>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black group-hover:bg-emerald-400 group-hover:text-black font-black font-display text-xs uppercase tracking-wider transition-all shadow-md">
+              <span>JUGAR</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
+
+        {/* EQUIPO Y AÑO */}
+        <div
+          onClick={() => { sound.playClick(); setPendingAction('TEAM_YEAR'); }}
+          className="group relative rounded-2xl p-5 sm:p-6 bg-[#0a0a0a] border border-white/15 hover:border-amber-400/60 transition-all duration-300 shadow-xl flex flex-col justify-between cursor-pointer hover:shadow-[0_0_30px_rgba(251,191,36,0.15)] hover:bg-[#0d0d0d] active:scale-[0.99]"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/40 to-transparent group-hover:via-amber-400 transition-all" />
+
+          <div>
+            <h3 className="text-2xl font-black uppercase font-display tracking-tight text-white group-hover:text-amber-400 transition-colors mb-1 flex items-center gap-2">
+              <Clock className="w-6 h-6" />
+              EQUIPO Y AÑO
+            </h3>
+            <p className="text-[12px] text-white/40 mb-4">Adivina el equipo y el año del jugador de la foto en 20 segundos</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              <span className="text-[11px] font-mono-code font-bold uppercase px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                5 FOTOS
+              </span>
+              <span className="text-[11px] font-mono-code font-bold uppercase px-2.5 py-1 rounded bg-white/[0.04] border border-white/10 text-white/80">
+                15 SEGUNDOS
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+            <span className="text-[11px] font-mono-code text-white/30 uppercase tracking-wider">
+              RANKING POR PUNTAJE
+            </span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black group-hover:bg-amber-400 group-hover:text-black font-black font-display text-xs uppercase tracking-wider transition-all shadow-md">
               <span>JUGAR</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>

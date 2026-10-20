@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, LeaderboardTop3Data, LeaderboardTop3Entry } from '../types/game';
 import { Trophy, Flame, ChevronDown, ChevronUp, RotateCw, Brain, Clock, TrendingUp } from 'lucide-react';
-import { fetchLeaderboardTop3Async, DEFAULT_LEADERBOARD_TOP3, fetchTriviaLeaderboardAsync, fetchMayorOMenorLeaderboardAsync } from '../utils/globalRecords';
+import { fetchLeaderboardTop3Async, DEFAULT_LEADERBOARD_TOP3, fetchTriviaLeaderboardAsync, fetchMayorOMenorLeaderboardAsync, fetchTeamYearLeaderboardAsync } from '../utils/globalRecords';
 import { sound } from '../utils/audio';
 
-type ActiveTab = GameMode | 'TRIVIA' | 'MAYOR_MENOR';
+type ActiveTab = GameMode | 'TRIVIA' | 'MAYOR_MENOR' | 'TEAM_YEAR';
 type MayorOMenorDataset = 'GLOBAL' | 'SALTO';
 
 interface LeaderboardTop3CardProps {
@@ -13,11 +13,13 @@ interface LeaderboardTop3CardProps {
 
 interface TriviaEntry { rank: number; playerName: string; score: number; timeSeconds: number }
 interface MayorOMenorEntry { rank: number; playerName: string; streak: number }
+interface TeamYearEntry { rank: number; playerName: string; score: number }
 
 export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initialData }) => {
   const [data, setData] = useState<LeaderboardTop3Data>(initialData || DEFAULT_LEADERBOARD_TOP3);
   const [triviaData, setTriviaData] = useState<TriviaEntry[]>([]);
   const [mayorData, setMayorData] = useState<Record<MayorOMenorDataset, MayorOMenorEntry[]>>({ GLOBAL: [], SALTO: [] });
+  const [teamYearData, setTeamYearData] = useState<TeamYearEntry[]>([]);
   const [mayorDataset, setMayorDataset] = useState<MayorOMenorDataset>('GLOBAL');
   const [activeMode, setActiveMode] = useState<ActiveTab>('FUTBOL11_SALTO');
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -26,15 +28,17 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [lb, trivia, mayorGlobal, mayorSalto] = await Promise.all([
+      const [lb, trivia, mayorGlobal, mayorSalto, teamYear] = await Promise.all([
         fetchLeaderboardTop3Async(),
         fetchTriviaLeaderboardAsync(),
         fetchMayorOMenorLeaderboardAsync('GLOBAL'),
         fetchMayorOMenorLeaderboardAsync('SALTO'),
+        fetchTeamYearLeaderboardAsync(),
       ]);
       setData(lb);
       setTriviaData(trivia.slice(0, 3));
       setMayorData({ GLOBAL: mayorGlobal.slice(0, 3), SALTO: mayorSalto.slice(0, 3) });
+      setTeamYearData(teamYear.slice(0, 3));
     } catch {
       // Ignore
     } finally {
@@ -46,7 +50,7 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
     loadData();
   }, []);
 
-  const currentList: LeaderboardTop3Entry[] = (activeMode !== 'TRIVIA' && activeMode !== 'MAYOR_MENOR') ? (data[activeMode as GameMode] || []) : [];
+  const currentList: LeaderboardTop3Entry[] = (activeMode !== 'TRIVIA' && activeMode !== 'MAYOR_MENOR' && activeMode !== 'TEAM_YEAR') ? (data[activeMode as GameMode] || []) : [];
 
   const getRankBadge = (rank: number) => {
     switch (rank) {
@@ -200,6 +204,22 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
               MAY/MEN
             </button>
 
+            <button
+              id="tab-top3-team-year"
+              onClick={() => {
+                sound.playClick();
+                setActiveMode('TEAM_YEAR');
+              }}
+              className={`flex-1 min-w-[80px] py-2 px-3 rounded-lg text-[12px] sm:text-xs font-bold uppercase tracking-wider transition-all text-center cursor-pointer flex items-center justify-center gap-1 ${
+                activeMode === 'TEAM_YEAR'
+                  ? 'bg-amber-400 text-black shadow-md'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Clock className="w-3 h-3" />
+              EQ/AÑO
+            </button>
+
             {/*<button
               id="tab-top3-f5"
               onClick={() => {
@@ -255,6 +275,28 @@ export const LeaderboardTop3Card: React.FC<LeaderboardTop3CardProps> = ({ initia
                   ))
                 )}
               </div>
+            ) : activeMode === 'TEAM_YEAR' ? (
+              teamYearData.length === 0 ? (
+                <p className="text-[11px] font-mono-code text-white/30 text-center py-3">Sin partidas registradas aún</p>
+              ) : (
+                teamYearData.map((entry) => (
+                  <div
+                    key={`team-year-${entry.rank}-${entry.playerName}`}
+                    className="px-3.5 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 flex items-center justify-between gap-3 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {getRankBadge(entry.rank)}
+                      <span className="font-bold text-xs sm:text-sm text-white uppercase tracking-wide truncate">
+                        {entry.playerName}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm sm:text-base font-black text-white">{entry.score}</span>
+                      <span className="text-[11px] text-white/40"> pts</span>
+                    </div>
+                  </div>
+                ))
+              )
             ) : activeMode === 'TRIVIA' ? (
               triviaData.length === 0 ? (
                 <p className="text-[11px] font-mono-code text-white/30 text-center py-3">Sin partidas registradas aún</p>

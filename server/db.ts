@@ -3,6 +3,7 @@ import { PLAYERS_DB } from '../src/data/players';
 import { PLAYERS_SALTO_DB } from '../src/data/salto/players';
 import { generateSeedForRun, encodeRunCode } from '../src/utils/seedCode';
 import { GameMode } from '../src/types/game';
+import TEAM_YEAR_TEAMS_FALLBACK from '../src/data/teamYear/teams.json';
 
 export interface GlobalRecordItem {
   score: number;
@@ -557,6 +558,72 @@ export async function fetchMayorOMenorLeaderboard(dataset: 'GLOBAL' | 'SALTO', l
     }));
   } catch (error) {
     console.error('[Neon DB] Error fetching mayor o menor leaderboard:', error);
+    return [];
+  }
+}
+
+// Equipos del modo EQUIPO Y AÑO; si no hay DB o la tabla está vacía, usa el JSON local
+export async function fetchTeamYearTeams(): Promise<Array<{ id: number; equipo: string; liga: string }>> {
+  const sql = getSqlClient();
+  if (!sql) return TEAM_YEAR_TEAMS_FALLBACK;
+
+  try {
+    const rows = await sql`
+      SELECT id, name, league
+      FROM team_year_teams
+      WHERE active = TRUE
+      ORDER BY name ASC
+    `;
+    if (rows.length === 0) return TEAM_YEAR_TEAMS_FALLBACK;
+    return rows.map((r: any) => ({ id: Number(r.id), equipo: String(r.name), liga: String(r.league) }));
+  } catch (error) {
+    console.error('[Neon DB] Error fetching equipo y año teams:', error);
+    return TEAM_YEAR_TEAMS_FALLBACK;
+  }
+}
+
+export async function insertTeamYearResult(params: {
+  playerName: string;
+  score: number;
+}): Promise<{ success: boolean; runId?: number; error?: string }> {
+  const sql = getSqlClient();
+  if (!sql) return { success: false, error: 'DATABASE_URL not configured' };
+
+  try {
+    await ensureTablesExist();
+    const cleanName = (params.playerName || 'DT ANÓNIMO').trim().slice(0, 50).toUpperCase();
+    const inserted = await sql`
+      INSERT INTO runs (player_name, mode, score, time_seconds, events_enabled)
+      VALUES (${cleanName}, 'TEAM_YEAR', ${params.score}, 0, false)
+      RETURNING id
+    `;
+    return { success: true, runId: Number(inserted[0]?.id) };
+  } catch (error) {
+    console.error('[Neon DB] Error inserting equipo y año result:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function fetchTeamYearLeaderboard(limit = 10): Promise<Array<{ rank: number; playerName: string; score: number }>> {
+  const sql = getSqlClient();
+  if (!sql) return [];
+
+  try {
+    await ensureTablesExist();
+    const rows = await sql`
+      SELECT player_name, score
+      FROM runs
+      WHERE mode = 'TEAM_YEAR'
+      ORDER BY score DESC, created_at ASC
+      LIMIT ${limit}
+    `;
+    return rows.map((r: any, idx: number) => ({
+      rank: idx + 1,
+      playerName: String(r.player_name || 'DT').trim().toUpperCase(),
+      score: Number(r.score) || 0,
+    }));
+  } catch (error) {
+    console.error('[Neon DB] Error fetching equipo y año leaderboard:', error);
     return [];
   }
 }

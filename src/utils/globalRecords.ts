@@ -223,6 +223,30 @@ export async function fetchTriviaLeaderboardAsync(): Promise<Array<{ rank: numbe
   }
 }
 
+export async function submitTeamYearResult(playerName: string, score: number): Promise<void> {
+  try {
+    await fetch('/api/team-year/result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerName, score }),
+    });
+  } catch (err) {
+    console.error('Error submitting equipo y año result:', err);
+  }
+}
+
+export async function fetchTeamYearLeaderboardAsync(): Promise<Array<{ rank: number; playerName: string; score: number }>> {
+  try {
+    const res = await fetch('/api/team-year/leaderboard');
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.entries || [];
+  } catch (err) {
+    console.error('Error fetching equipo y año leaderboard:', err);
+    return [];
+  }
+}
+
 export async function submitMayorOMenorResult(playerName: string, streak: number, dataset: 'GLOBAL' | 'SALTO'): Promise<void> {
   try {
     await fetch('/api/mayor-o-menor/result', {

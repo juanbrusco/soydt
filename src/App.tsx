@@ -61,6 +61,7 @@ import { LoadingPlayersScreen } from './components/LoadingPlayersScreen';
 import { FriendRoomModal } from './components/FriendRoomModal';
 import { TriviaGame } from './components/TriviaGame';
 import { MayorOMenorGame } from './components/MayorOMenorGame';
+import { TeamYear } from './components/TeamYear';
 import { submitRoomEntryAsync } from './utils/friendRooms';
 import { sendGameStatSilently } from './utils/stats';
 import { Flame, Sparkles } from 'lucide-react';
@@ -76,6 +77,7 @@ export default function App() {
   const [lastRuns, setLastRuns] = useState<Record<GameMode, ModeRecord | null>>({ FUTBOL11: null, FUTBOL5: null, FUTBOL11_SALTO: null, TRIVIA: null });
   const [isTriviaActive, setIsTriviaActive] = useState(false);
   const [isMayorOMenorActive, setIsMayorOMenorActive] = useState(false);
+  const [isTeamYearActive, setIsTeamYearActive] = useState(false);
   const [recentRuns, setRecentRuns] = useState<RunHistoryItem[]>([]);
   const [globalRecords, setGlobalRecords] = useState(getGlobalGameRecords());
   const [currentNeonRunId, setCurrentNeonRunId] = useState<number | null>(null);
@@ -302,6 +304,7 @@ export default function App() {
     setEventFeedback(null);
     setIsTriviaActive(false);
     setIsMayorOMenorActive(false);
+    setIsTeamYearActive(false);
     setIsHome(true);
   }, []);
 
@@ -1117,6 +1120,10 @@ export default function App() {
               setIsMayorOMenorActive(true);
               setIsHome(false);
             }}
+            onTeamYear={() => {
+              setIsTeamYearActive(true);
+              setIsHome(false);
+            }}
             onOpenFriendRooms={(code) => {
               if (code) setFriendRoomInitialCode(code);
               setIsFriendRoomModalOpen(true);
@@ -1135,6 +1142,8 @@ export default function App() {
             playerName={currentPlayerName}
             onBack={handleGoHome}
           />
+        ) : isTeamYearActive ? (
+          <TeamYear playerName={currentPlayerName} onBack={handleGoHome} />
         ) : isMayorOMenorActive ? (
           <MayorOMenorGame
             playerName={currentPlayerName}
