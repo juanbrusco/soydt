@@ -1,4 +1,4 @@
-import { FriendRoom, FriendRoomEntry, GameMode } from '../types/game';
+import { FriendRoom, FriendRoomEntry, FriendRoomMode } from '../types/game';
 
 const STORAGE_KEY_RECENT_ROOMS = 'soydt_recent_friend_rooms_v1';
 
@@ -41,7 +41,7 @@ export function getWhatsAppShareLink(roomName: string, roomCode: string, url: st
  */
 export async function createRoomAsync(params: {
   name?: string;
-  mode: GameMode;
+  mode: FriendRoomMode;
   createdBy: string;
 }): Promise<{ success: boolean; room?: FriendRoom; error?: string }> {
   try {
@@ -119,7 +119,7 @@ export async function submitRoomEntryAsync(params: {
 export interface SavedRoomRef {
   code: string;
   name: string;
-  mode: GameMode;
+  mode: FriendRoomMode;
   visitedAt: string;
 }
 
@@ -133,7 +133,7 @@ export function getRecentRooms(): SavedRoomRef[] {
   }
 }
 
-export function saveRecentRoom(code: string, name: string, mode: GameMode) {
+export function saveRecentRoom(code: string, name: string, mode: FriendRoomMode) {
   try {
     const current = getRecentRooms();
     const cleanCode = code.trim().toUpperCase();

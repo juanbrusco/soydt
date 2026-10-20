@@ -62,7 +62,7 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
 
   // Form states
   const [createName, setCreateName] = useState<string>('El Trofeo de la Fecha');
-  const [createMode, setCreateMode] = useState<'FUTBOL11' | 'FUTBOL11_SALTO'>('FUTBOL11_SALTO');
+  const [createMode, setCreateMode] = useState<'FUTBOL11' | 'FUTBOL11_SALTO' | 'TEAM_YEAR'>('FUTBOL11_SALTO');
   const [joinCodeInput, setJoinCodeInput] = useState<string>('');
   const [recentRooms, setRecentRooms] = useState<SavedRoomRef[]>([]);
   const [showNameModal, setShowNameModal] = useState(false);
@@ -633,6 +633,25 @@ export const FriendRoomModal: React.FC<FriendRoomModalProps> = ({
                     </div>
                     <div className="text-[11px]  text-[#38BDF8]">
                       4-3-3 • Ligas del Mundo
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playClick();
+                      setCreateMode('TEAM_YEAR');
+                    }}
+                    className={`col-span-2 p-3 rounded-xl border text-left transition-all cursor-pointer ${createMode === 'TEAM_YEAR'
+                        ? 'bg-[#38BDF8]/15 border-[#38BDF8] text-white shadow-md'
+                        : 'bg-white/[0.02] border-white/10 text-white/60 hover:text-white'
+                      }`}
+                  >
+                    <div className="font-display font-black text-xs uppercase mb-0.5">
+                      EQUIPO Y AÑO
+                    </div>
+                    <div className="text-[11px]  text-[#38BDF8]">
+                      Las mismas 5 fotos para todos
                     </div>
                   </button>
                 </div>

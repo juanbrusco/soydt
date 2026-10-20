@@ -2,7 +2,7 @@ import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 import { PLAYERS_DB } from '../src/data/players';
 import { PLAYERS_SALTO_DB } from '../src/data/salto/players';
 import { generateSeedForRun, encodeRunCode } from '../src/utils/seedCode';
-import { GameMode } from '../src/types/game';
+import { GameMode, FriendRoomMode } from '../src/types/game';
 import TEAM_YEAR_TEAMS_FALLBACK from '../src/data/teamYear/teams.json';
 
 export interface GlobalRecordItem {
@@ -825,7 +825,7 @@ export async function fetchPlayersFromDb(
 interface MemoryFriendRoom {
   code: string;
   name: string;
-  mode: GameMode;
+  mode: FriendRoomMode;
   runCode: string;
   createdBy: string;
   maxPlayers: number;
@@ -855,15 +855,17 @@ function generateRoomCode(): string {
 
 export async function createFriendRoom(params: {
   name?: string;
-  mode: 'FUTBOL11' | 'FUTBOL11_SALTO';
+  mode: 'FUTBOL11' | 'FUTBOL11_SALTO' | 'TEAM_YEAR';
   createdBy: string;
 }): Promise<{ success: boolean; room?: any; error?: string }> {
-  const cleanMode: GameMode = params.mode === 'FUTBOL11_SALTO' ? 'FUTBOL11_SALTO' : 'FUTBOL11';
+  const cleanMode = (['FUTBOL11_SALTO', 'TEAM_YEAR'] as const).find(m => m === params.mode) ?? 'FUTBOL11';
   const cleanName = (params.name || 'El Trofeo de la Fecha').trim().slice(0, 50) || 'El Trofeo de la Fecha';
   const cleanCreatedBy = (params.createdBy || 'DT').trim().slice(0, 30).toUpperCase() || 'DT';
 
-  const { seed } = generateSeedForRun(cleanMode);
-  const runCode = encodeRunCode(seed, cleanMode, 0);
+  // TEAM_YEAR no usa draft: su run_code es solo la semilla que ordena las fotos de la sala
+  const runCode = cleanMode === 'TEAM_YEAR'
+    ? `TY-${Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase().padStart(8, '0')}`
+    : encodeRunCode(generateSeedForRun(cleanMode).seed, cleanMode, 0);
 
   const sql = getSqlClient();
   let code = generateRoomCode();

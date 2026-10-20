@@ -184,10 +184,13 @@ export interface FriendRoomEntry {
   createdAt?: string;
 }
 
+// Modos que se pueden jugar en una sala de amigos (TEAM_YEAR no es un GameMode del draft)
+export type FriendRoomMode = GameMode | 'TEAM_YEAR';
+
 export interface FriendRoom {
   code: string;
   name: string;
-  mode: GameMode;
+  mode: FriendRoomMode;
   runCode: string;
   createdBy: string;
   maxPlayers: number;

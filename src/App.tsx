@@ -465,10 +465,17 @@ export default function App() {
         savePlayerName(participantName);
       }
 
-      setCurrentMode(room.mode);
       setIsHome(false);
 
-      startNewRun(room.mode);
+      if (room.mode === 'TEAM_YEAR') {
+        setIsTeamYearActive(true);
+        return;
+      }
+
+      setIsTeamYearActive(false);
+      setCurrentMode(room.mode);
+      // Semilla compartida de la sala: todos juegan el mismo draft
+      startNewRun(room.mode, decodeRunCode(room.runCode) ?? undefined);
     },
     [currentPlayerName, startNewRun]
   );
@@ -1143,7 +1150,18 @@ export default function App() {
             onBack={handleGoHome}
           />
         ) : isTeamYearActive ? (
-          <TeamYear playerName={currentPlayerName} onBack={handleGoHome} />
+          <TeamYear
+            key={currentActiveFriendRoom?.room.code ?? 'solo'}
+            playerName={currentPlayerName}
+            onBack={handleGoHome}
+            friendRoom={currentActiveFriendRoom?.room}
+            onFinish={(total) => recordFriendRoomScoreIfActive(total, 'EQUIPO Y AÑO', 'EQUIPO Y AÑO')}
+            friendRoomResult={friendRoomResult}
+            onOpenFriendRoom={(code) => {
+              setFriendRoomInitialCode(code);
+              setIsFriendRoomModalOpen(true);
+            }}
+          />
         ) : isMayorOMenorActive ? (
           <MayorOMenorGame
             playerName={currentPlayerName}

@@ -38,7 +38,7 @@
   100% { opacity: 0; transform: translateX(100%); }
 }
 .animate-teamyear-photo-in { animation: teamyear-photo-in 0.5s ease-out; }
-.animate-teamyear-banner { animation: teamyear-banner 1.2s ease-in-out forwards; }
+.animate-teamyear-banner { animation: teamyear-banner 1.5s ease-in-out forwards; }
 
 @keyframes pulse-sky-glow {
   0%, 100% {
