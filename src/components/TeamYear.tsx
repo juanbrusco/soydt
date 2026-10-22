@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ChevronRight, Clock, RotateCw, Search, Trophy, Users, X } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Clock, RotateCw, Search, Trophy, Users, X } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { submitTeamYearResult } from '../utils/globalRecords';
 import { DeterministicRNG } from '../utils/rng';
@@ -65,6 +65,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
   const [timeLeft, setTimeLeft] = useState(SECONDS);
   const [teamGuess, setTeamGuess] = useState<Team | null>(null);
   const [teamModalOpen, setTeamModalOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const [teamSearch, setTeamSearch] = useState('');
   const [yearGuess, setYearGuess] = useState('');
   const [results, setResults] = useState<RoundResult[]>([]);
@@ -115,6 +116,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
         setTimeLeft(SECONDS);
         setTeamGuess(null);
         setYearGuess('');
+        setConfirmed(false);
       }
       setChanging(false);
     }, TRANSITION_MS);
@@ -147,6 +149,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
     setResults([]);
     setTeamGuess(null);
     setYearGuess('');
+    setConfirmed(false);
     setTimeLeft(SECONDS);
   };
 
@@ -175,16 +178,28 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
             <Trophy className="w-6 h-6 text-amber-400" />
             <h2 className="text-2xl font-black font-display uppercase">{total} PTS</h2>
           </div>
-          <ul className="flex flex-col gap-2 text-xs font-mono-code">
-            {results.map((r, i) => (
-              <li key={i} className="flex justify-between gap-2 border-b border-white/10 pb-2">
-                <span className="text-white/60">
-                  {teams.find(t => t.id === r.photo.teamId)?.equipo ?? '?'} {r.photo.year}
-                  <span className="block text-white/30">Tu respuesta: {r.teamGuess?.equipo ?? '—'} {r.yearGuess || '—'}</span>
-                </span>
-                <span className="font-black text-white">{r.points}</span>
-              </li>
-            ))}
+          <ul className="flex flex-col gap-2">
+            {results.map((r, i) => {
+              const teamOk = r.teamGuess?.id === r.photo.teamId;
+              const yearOk = r.yearGuess === String(r.photo.year);
+              const rowColor = teamOk && yearOk
+                ? 'bg-emerald-500/10 border-emerald-500/25'
+                : r.points > 0 ? 'bg-amber-500/10 border-amber-500/25' : 'bg-rose-500/10 border-rose-500/25';
+              return (
+                <li key={i} className={`flex items-center gap-3 rounded-xl border px-3 py-2 ${rowColor}`}>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-base font-black font-display uppercase text-white truncate">
+                      {teams.find(t => t.id === r.photo.teamId)?.equipo ?? '?'} <span className="text-amber-300">{r.photo.year}</span>
+                    </span>
+                    <span className="block text-sm font-mono-code text-white/50 truncate">
+                      Tú: <span className={teamOk ? 'text-emerald-400' : 'text-rose-400'}>{r.teamGuess?.equipo ?? '—'}</span>{' '}
+                      <span className={yearOk ? 'text-emerald-400' : 'text-rose-400'}>{r.yearGuess || '—'}</span>
+                    </span>
+                  </span>
+                  <span className="text-lg font-black font-display text-white">{r.points}</span>
+                </li>
+              );
+            })}
           </ul>
           {friendRoom ? (
             // En sala: un solo intento, se muestra la posición y se vuelve a la tabla
@@ -250,6 +265,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
 
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-mono-code font-bold uppercase text-white/50">Año</label>
+            <div className="flex gap-2">
             <input
               value={yearGuess}
               onChange={e => setYearGuess(e.target.value.replace(/\D/g, '').slice(0, 4))}
@@ -258,18 +274,30 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
               maxLength={4}
               placeholder="AAAA"
               autoComplete="off"
-              className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/15 text-base text-white font-mono-code tracking-[0.3em] focus:border-[#38BDF8] outline-none"
+              className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/15 text-base text-white font-mono-code tracking-[0.3em] focus:border-[#38BDF8] outline-none"
             />
+            {/* Solo visual: la ronda sigue hasta que termine el tiempo */}
+            <button
+              onClick={() => { sound.playClick(); setConfirmed(true); }}
+              disabled={changing || confirmed}
+              aria-label="Confirmar"
+              className={`w-14 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors ${
+                confirmed ? 'bg-white/10 text-white/50 cursor-default' : 'bg-emerald-500 hover:bg-emerald-400 text-black'
+              }`}
+            >
+              {confirmed ? <Clock className="w-5 h-5 animate-spin" /> : <Check className="w-6 h-6" strokeWidth={3} />}
+            </button>
+            </div>
           </div>
 
-          {/* Modal de equipos: bottom sheet en mobile, centrado en desktop */}
+          {/* Modal de equipos: anclado arriba y con alto fijo para que no se mueva al filtrar */}
           {teamModalOpen && (
             <div
-              className="fixed inset-0 z-40 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm animate-fadeIn"
+              className="fixed inset-0 z-40 flex items-start justify-center px-3 pt-[8dvh] bg-black/70 backdrop-blur-sm animate-fadeIn"
               onClick={() => setTeamModalOpen(false)}
             >
               <div
-                className="w-full sm:max-w-md max-h-[85vh] flex flex-col rounded-t-2xl sm:rounded-2xl bg-[#0a0a0a] border border-white/15 shadow-2xl"
+                className="w-full sm:max-w-md h-[60dvh] flex flex-col rounded-2xl bg-[#0a0a0a] border border-white/15 shadow-2xl"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="p-4 border-b border-white/10 flex flex-col gap-3">
@@ -293,7 +321,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
                     />
                   </div>
                 </div>
-                <div className="overflow-y-auto p-2">
+                <div className="flex-1 min-h-0 overflow-y-auto p-2">
                   {filteredTeams.length === 0 ? (
                     <p className="text-xs font-mono-code text-white/30 text-center py-6">Sin resultados</p>
                   ) : (
