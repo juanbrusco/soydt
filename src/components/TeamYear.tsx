@@ -15,19 +15,19 @@ interface Props {
 }
 
 interface Team { id: number; equipo: string; liga: string }
-interface Photo { image: string; teamId: number; year: number }
+interface Photo { image: string; teamId: number; year: number; player: string }
 interface RoundResult { photo: Photo; teamGuess: Team | null; yearGuess: string; points: number }
 
 const ROUNDS = 5;
 const SECONDS = 15;
 const TRANSITION_MS = 1500;
 
-// Fotos en src/assets/teamyear con nombre <team_id>_<año>.<ext> (team_id = id en team_year_teams)
+// Fotos en src/assets/teamyear con nombre <team_id>_<año>[_<apellido>].<ext> (team_id = id en team_year_teams)
 const PHOTOS: Photo[] = Object.entries(
   import.meta.glob('../assets/teamyear/*.{jpg,jpeg,png,webp,svg}', { eager: true, import: 'default' }) as Record<string, string>
 ).flatMap(([path, image]) => {
-  const match = path.match(/\/(\d+)_(\d{4})\.\w+$/);
-  return match ? [{ image, teamId: Number(match[1]), year: Number(match[2]) }] : [];
+  const match = path.match(/\/(\d+)_(\d{4})(?:_([^/]+?))?\.\w+$/);
+  return match ? [{ image, teamId: Number(match[1]), year: Number(match[2]), player: match[3] ?? '' }] : [];
 });
 
 // Con semilla (sala de amigos) todos reciben las mismas fotos en el mismo orden
@@ -189,7 +189,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
                 <li key={i} className={`flex items-center gap-3 rounded-xl border px-3 py-2 ${rowColor}`}>
                   <span className="flex-1 min-w-0">
                     <span className="block text-base font-black font-display uppercase text-white truncate">
-                      {teams.find(t => t.id === r.photo.teamId)?.equipo ?? '?'} <span className="text-amber-300">{r.photo.year}</span>
+                      {teams.find(t => t.id === r.photo.teamId)?.equipo ?? '?'} <span className="text-amber-300">{r.photo.year}</span>{r.photo.player && <span className="text-white/60"> · {r.photo.player}</span>}
                     </span>
                     <span className="block text-sm font-mono-code text-white/50 truncate">
                       Tú: <span className={teamOk ? 'text-emerald-400' : 'text-rose-400'}>{r.teamGuess?.equipo ?? '—'}</span>{' '}
@@ -353,7 +353,7 @@ export const TeamYear: React.FC<Props> = ({ playerName, onBack, friendRoom, onFi
               <div className="w-full py-5 animate-teamyear-banner bg-amber-400 text-black text-center font-black font-display uppercase shadow-2xl">
                 <div className="text-3xl tracking-wider">¡TIEMPO!</div>
                 <div className="text-sm font-mono-code tracking-widest">
-                  {round < rounds - 1 ? `Siguiente: foto ${round + 2}/${rounds}` : 'Calculando puntaje...'}
+                  {round < rounds - 1 ? "" : 'Calculando puntaje...'}
                 </div>
               </div>
             </div>
